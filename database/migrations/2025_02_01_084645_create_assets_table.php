@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -12,28 +11,61 @@ return new class extends Migration
      */
     public function up(): void
     {
+
+        Schema::create('asset_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique(); // e.g., 'cash', 'property', 'stock', 'bond'
+            $table->timestampsTz();
+            $table->softDeletesTz();
+        });
+
+        Schema::create('asset_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique(); // 'category', ['fixed', 'liquid', 'semi_liquid']
+            $table->timestampsTz();
+            $table->softDeletesTz();
+        });
+
+        Schema::create('asset_statuses', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique(); // e.g., 'active', 'pending', 'sold', 'inactive', 'archived', 'suspended', etc.
+            $table->timestampsTz();
+            $table->softDeletesTz();
+        });
+
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('account_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('currency_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('asset_type_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('asset_category_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('asset_status_id')->constrained('asset_statuses')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
-            $table->string('type')->comment('Type of the investment e.g(cash, property)');
             $table->decimal('current_value', 15, 2)->unsigned();
             $table->decimal('purchase_price', 15, 2)->unsigned()->nullable();
             $table->decimal('sell_price', 15, 2)->unsigned()->nullable();
-            $table->enum('category', ['fixed', 'liquid', 'semi_liquid']);
-            $table->enum('status', ['active', 'pending', 'sold', 'inactive'])->default('active');
             $table->string('location')->nullable();
             $table->text('notes')->nullable();
             $table->timestampTz('sell_at')->nullable();
-            $table->timestampTz('purchase_at')->default()->useCurrent();
+            $table->timestampTz('purchase_at')->useCurrent();
             $table->timestampsTz();
             $table->softDeletesTz();
             $table->unique(['user_id', 'name']);
             $table->index('user_id');
             $table->index('account_id');
-            $table->index('currency_id'); // rate this schema 1 to 10 1 is lowes 10 is highest and suggest changes if needed
+            $table->index('currency_id');
+            $table->index('asset_type_id');
+        });
+
+        Schema::create('asset_value_history', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('asset_id')->constrained()->cascadeOnDelete();
+            $table->decimal('value', 15, 2)->unsigned();
+            $table->timestampTz('recorded_at')->useCurrent();
+            $table->timestampsTz();
+
+            $table->index('asset_id'); // Single index
         });
     }
 
@@ -42,6 +74,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('asset_value_history');
         Schema::dropIfExists('assets');
+        Schema::dropIfExists('asset_statuses');
+        Schema::dropIfExists('asset_categories');
+        Schema::dropIfExists('asset_types');
     }
+
 };
