@@ -60,7 +60,7 @@
 					</a>
 					<ul class="dropdown-menu" aria-labelledby="addonsDropdown">
 						<li>
-							<a class="dropdown-item" href="{{ route('asset_types.show') }}">Assets</a>
+							<a class="dropdown-item" href="{{ route('asset_types.show') }}">Assets Types</a>
 						</li>
 						<li>
 							<a class="dropdown-item" href="{{ route('currencies.currencies') }}">Currencies</a>
