@@ -14,23 +14,29 @@ return new class extends Migration
 
         Schema::create('asset_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // e.g., 'cash', 'property', 'stock', 'bond'
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('name'); // e.g., 'cash', 'property', 'stock', 'bond'
             $table->timestampsTz();
             $table->softDeletesTz();
+            $table->unique(['user_id', 'name']);
         });
 
         Schema::create('asset_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // 'category', ['fixed', 'liquid', 'semi_liquid']
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('name'); // 'category', ['fixed', 'liquid', 'semi_liquid']
             $table->timestampsTz();
             $table->softDeletesTz();
+            $table->unique(['user_id', 'name']);
         });
 
         Schema::create('asset_statuses', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // e.g., 'active', 'pending', 'sold', 'inactive', 'archived', 'suspended', etc.
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('name'); // e.g., 'active', 'pending', 'sold', 'inactive', 'archived', 'suspended', etc.
             $table->timestampsTz();
             $table->softDeletesTz();
+            $table->unique(['user_id', 'name']);
         });
 
         Schema::create('assets', function (Blueprint $table) {

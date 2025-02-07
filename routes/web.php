@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\currencyController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SessionController;
@@ -33,6 +34,13 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/transactions', [TransactionController::class, 'show'])->middleware('auth')->name('transactions.show');
+
+Route::get('/asset_type', [AssetTypeController::class, 'show'])->name('asset_types.show')->middleware('auth');
+Route::POST('/asset_type/store', [AssetTypeController::class, 'store'])->name('asset_types.store')->middleware('auth');
+Route::delete('/asset_type/{assetType}', [AssetTypeController::class, 'destroy'])->name('asset_types.destroy')->middleware('auth');
+Route::put('/asset_types/{assetType}', [AssetTypeController::class, 'update'])->name('asset_types.update')->middleware('auth');
+
+
 
 Route::get('/assets', [AssetController::class, 'show'])->name('assets.show')->middleware('auth');
 Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create')->middleware('auth');
