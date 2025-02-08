@@ -29,7 +29,10 @@ class AssetTypeController extends Controller
         ]);
 
         $user = Auth::user();
-        $assetType = AssetType::withTrashed()->where('name', $validated['name'])->first();
+        $assetType = AssetType::withTrashed()
+        ->where('name', $validated['name'])
+        ->where('user_id', $user->id)
+        ->first();
 
         if ($assetType)
         {
@@ -37,17 +40,11 @@ class AssetTypeController extends Controller
             {
                 $assetType->restore();
 
-                $assetType->update([
-                    'user_id' => $user->id,
-                ]);
-
                 return redirect()->route('asset_types.show')->with('success', 'Asset type created successfully!');
             }
             else
             {
-                return redirect()
-                    ->route('asset_types.show')
-                    ->with('error', 'Asset type already exists!');
+                return redirect()->route('asset_types.show')->with('error', 'Asset type already exists!');
             }
         }
 
@@ -75,13 +72,14 @@ class AssetTypeController extends Controller
 
     public function update(Request $request, AssetType $assetType)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
 
         if ($assetType->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
 
         $assetType->update($validated);
 

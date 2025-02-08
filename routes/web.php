@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AssetStatusController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\currencyController;
 use App\Http\Controllers\ExpenseController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\LiabilityController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Models\AssetStatus;
 use Symfony\Component\Routing\Route as RoutingRoute;
 
 Route::get('/', function () {
@@ -40,6 +42,10 @@ Route::POST('/asset_type/store', [AssetTypeController::class, 'store'])->name('a
 Route::delete('/asset_type/{assetType}', [AssetTypeController::class, 'destroy'])->name('asset_types.destroy')->middleware('auth');
 Route::put('/asset_types/{assetType}', [AssetTypeController::class, 'update'])->name('asset_types.update')->middleware('auth');
 
+Route::get('/asset_status', [AssetStatusController::class, 'show'])->name('asset_statuses.show')->middleware('auth');
+Route::POST('/asset_status/store', [AssetStatusController::class, 'store'])->name('asset_statuses.store')->middleware('auth');
+Route::delete('/asset_status/{assetStatus}', [AssetStatusController::class, 'destroy'])->name('asset_statuses.destroy')->middleware('auth');
+Route::put('/asset_status/{assetStatus}', [AssetStatusController::class, 'update'])->name('asset_statuses.update')->middleware('auth');
 
 
 Route::get('/assets', [AssetController::class, 'show'])->name('assets.show')->middleware('auth');
