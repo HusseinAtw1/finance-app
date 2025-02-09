@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Liability;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AssetCategoryController;
 use App\Http\Controllers\AssetStatusController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\currencyController;
@@ -13,8 +13,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\LiabilityController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\RegisteredUserController;
-use App\Models\AssetStatus;
-use Symfony\Component\Routing\Route as RoutingRoute;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -47,6 +46,10 @@ Route::POST('/asset_status/store', [AssetStatusController::class, 'store'])->nam
 Route::delete('/asset_status/{assetStatus}', [AssetStatusController::class, 'destroy'])->name('asset_statuses.destroy')->middleware('auth');
 Route::put('/asset_status/{assetStatus}', [AssetStatusController::class, 'update'])->name('asset_statuses.update')->middleware('auth');
 
+Route::get('/asset_categories', [AssetCategoryController::class, 'show'])->name('asset_categories.show')->middleware('auth');
+Route::POST('/asset_categories', [AssetCategoryController::class, 'store'])->name('asset_categories.store')->middleware('auth');
+Route::put('/asset_categories/{assetCategory}', [AssetCategoryController::class, 'update'])->name('asset_categories.update')->middleware('auth');
+Route::delete('/asset_categories/{assetCategory}', [AssetCategoryController::class, 'destroy'])->name('asset_categories.destroy')->middleware('auth');
 
 Route::get('/assets', [AssetController::class, 'show'])->name('assets.show')->middleware('auth');
 Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create')->middleware('auth');

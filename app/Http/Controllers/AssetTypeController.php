@@ -28,6 +28,8 @@ class AssetTypeController extends Controller
             'name' => 'required|string|max:255'
         ]);
 
+        $validated['name'] = ucfirst(strtolower($validated['name']));
+
         $user = Auth::user();
         $assetType = AssetType::withTrashed()
         ->where('name', $validated['name'])

@@ -27,6 +27,8 @@ class AssetStatusController extends Controller
             'name' => 'required|string|max:255'
         ]);
 
+        $validated['name'] = ucfirst(strtolower($validated['name']));
+
         $user = Auth::user();
         $assetStatus = AssetStatus::withTrashed()->where(function($query) use ($user, $validated) {
             $query->where('name', $validated['name']);
