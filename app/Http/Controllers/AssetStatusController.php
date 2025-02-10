@@ -59,11 +59,8 @@ class AssetStatusController extends Controller
 
     public function destroy(AssetStatus $assetStatus)
     {
-        $user = Auth::user();
-        if($assetStatus->user_id !== $user->id)
-        {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('delete', $assetStatus);
+
         $assetStatus->delete();
 
         return redirect()->route('asset_statuses.show')->with('success', 'Asset status delete successfully!');
@@ -71,12 +68,7 @@ class AssetStatusController extends Controller
 
     public function update(Request $request, AssetStatus $assetStatus)
     {
-        $user = Auth::user();
-
-        if($assetStatus->user_id !== $user->id)
-        {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('update', $assetStatus);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -85,7 +77,5 @@ class AssetStatusController extends Controller
         $assetStatus->update($validated);
 
         return redirect()->route('asset_statuses.show')->with('success', 'Asset status edited successfully!');
-
-
     }
 }

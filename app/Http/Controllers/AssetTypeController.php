@@ -61,10 +61,7 @@ class AssetTypeController extends Controller
 
     public function destroy(AssetType $assetType)
     {
-        if ($assetType->user_id !== Auth::id())
-        {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('delete', $assetType);
 
         $assetType->delete();
 
@@ -74,10 +71,7 @@ class AssetTypeController extends Controller
 
     public function update(Request $request, AssetType $assetType)
     {
-
-        if ($assetType->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('update', $assetType);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',

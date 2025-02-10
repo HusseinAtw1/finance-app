@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-md mx-auto" style="max-width: 800px;">
     <h2 class="mb-4 text-center">Asset Statuses</h2>
-    
+
     <form id="assetStatusForm" action="{{ route('asset_statuses.store') }}" method="POST" class="mb-4">
         @csrf
         <div class="alert alert-info">
@@ -19,6 +19,9 @@
         <div class="d-grid gap-2 mx-auto" style="max-width: 200px;">
             <button type="submit" class="btn btn-primary btn-sm py-2 fw-bold" id="formButton">
                 <i class="bi bi-plus-circle me-2"></i><span id="formButtonText">Add Asset Status</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm py-2 fw-bold mt-2" id="cancelButton" style="display: none;">
+                <i class="bi bi-x-circle me-2"></i><span>Cancel Edit</span>
             </button>
         </div>
     </form>
@@ -78,6 +81,7 @@
         const formTitle = document.getElementById('formTitle');
         const formButton = document.getElementById('formButton');
         const formButtonText = document.getElementById('formButtonText');
+        const cancelButton = document.getElementById('cancelButton'); // <-- Added this line
 
         editButtons.forEach(button => {
             button.addEventListener('click', function () {
@@ -99,7 +103,28 @@
                 formButtonText.textContent = 'Update Asset Status';
                 formButton.querySelector('i').className = 'bi bi-pencil-square me-2';
                 form.scrollIntoView({ behavior: 'smooth' });
+
+                // Show the cancel button when editing
+                cancelButton.style.display = 'block';
             });
+        });
+
+        cancelButton.addEventListener('click', function () {
+            // Reset form action back to the store route
+            form.action = "{{ route('asset_statuses.store') }}";
+
+            // Reset the hidden _method input (if it exists)
+            let methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) {
+                methodInput.value = '';
+            }
+
+            // Clear the name input
+            nameInput.value = '';
+            formTitle.textContent = 'Enter the name for your new asset status.';
+            formButtonText.textContent = 'Add Asset Status';
+            formButton.querySelector('i').className = 'bi bi-plus-circle me-2';
+            cancelButton.style.display = 'none';
         });
     });
 </script>

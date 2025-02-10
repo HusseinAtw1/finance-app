@@ -7,6 +7,11 @@
             {{ session('success') }}
         </div>
     @endif
+    @if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+    @endif
 
     <div class="row">
         <div class="col-md-4">
@@ -24,6 +29,7 @@
                 </div>
 
                 <button type="submit" id="submitButton" class="btn btn-primary">Add Asset Type</button>
+                <button type="button" id="cancelButton" class="btn btn-secondary d-none">Cancel</button>
             </form>
         </div>
         <div class="col-md-12 mt-4">
@@ -70,6 +76,7 @@
         const assetTypeIdInput = document.getElementById("asset_type_id");
         const nameInput = document.getElementById("name");
         const submitButton = document.getElementById("submitButton");
+        const cancelButton = document.getElementById("cancelButton");
         const editButtons = document.querySelectorAll(".edit-btn");
         editButtons.forEach(button => {
             button.addEventListener("click", function() {
@@ -80,9 +87,18 @@
                 form.action = `{{ url('asset_types') }}/${assetTypeId}`;
                 form.querySelector("input[name='_method']").value = "PUT";
                 submitButton.textContent = "Update Asset Type";
-                submitButton.classList.remove("btn-primary");
-                submitButton.classList.add("btn-warning");
+                cancelButton.classList.remove("d-none");
             });
+        });
+        cancelButton.addEventListener("click", function() {
+            assetTypeIdInput.value = "";
+            nameInput.value = "";
+            form.action = "{{ route('asset_types.store') }}";
+            form.querySelector("input[name='_method']").value = "POST";
+            submitButton.textContent = "Add Asset Type";
+            submitButton.classList.remove("btn-warning");
+            submitButton.classList.add("btn-primary");
+            cancelButton.classList.add("d-none");
         });
     });
 </script>
