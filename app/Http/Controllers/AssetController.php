@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Account;
 use App\Models\Currency;
+use App\Models\AssetType;
+use App\Models\AssetStatus;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Models\AssetCategory;
 use Illuminate\Support\Facades\Auth;
 
 class AssetController extends Controller
@@ -15,46 +18,33 @@ class AssetController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
-            return redirect()->route('login');
-        }
+        $accounts = Account::where('user_id', $user->id)->where('acc_type', 'asset')->get();
 
-        // Get all asset accounts for the user
-        $accounts = Account::where('user_id', $user->id)
-                    ->where('acc_type', 'asset')
-                    ->get();
-
-        // Selected account from the query string (or default to the first account if available)
         $selectedAccount = $request->input('account_id', $accounts->first()->id ?? null);
 
-        // Get the status filter: "owned" or "sold" (default to owned)
         $status = $request->input('status', 'owned');
 
-        // Get the search term if provided
         $search = $request->input('search');
 
-        // Build the assets query
-        $assets = Asset::where('user_id', $user->id)
-            ->when($selectedAccount, function ($query, $selectedAccount) {
-                return $query->where('account_id', $selectedAccount);
-            })
-            ->when($status, function ($query, $status) {
-                if ($status === 'sold') {
-                    return $query->where('owns', false);
-                } elseif ($status === 'owned') {
-                    return $query->where('owns', true);
-                }
+        $assets = Asset::where('user_id', $user->id)->when($selectedAccount, function ($query, $selectedAccount) {
+                    return $query->where('account_id', $selectedAccount);
+                })->when($status, function ($query, $status) {
+                    if ($status === 'sold')
+                    {
+                        return $query->onlyTrashed();
+                    }
+                    elseif ($status === 'owned')
+                    {
+                        return $query;
+                    }
                 return $query;
-            })
-            ->when($search, function ($query, $search) {
-                return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('notes', 'like', "%{$search}%");
-                });
-            })
-            ->paginate(9);
+                })->when($search, function ($query, $search) {
+                    return $query->where(function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%");
+                    });
+                })->paginate(9);
 
-        // Pass the additional variables to the view as well
         return view('assets.assets', compact('assets', 'accounts', 'selectedAccount', 'status', 'search'));
     }
 
@@ -65,8 +55,11 @@ class AssetController extends Controller
                     ->where('acc_type', 'asset')
                     ->get();
         $currencies = Currency::all();
+        $assetStatuses = AssetStatus::all();
+        $assetCategories = AssetCategory::all();
+        $assetTypes = AssetType::all();
 
-        return view('assets.create', compact('accs', 'currencies'));
+        return view('assets.create', compact('accs', 'currencies', 'assetStatuses', 'assetCategories', 'assetTypes'));
     }
 
     public function store(Request $request)
