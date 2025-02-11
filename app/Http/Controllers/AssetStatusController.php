@@ -70,9 +70,34 @@ class AssetStatusController extends Controller
     {
         $this->authorize('update', $assetStatus);
 
+        $user = Auth::user();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
+
+        $validated['name'] = ucfirst(strtolower($validated['name']));
+
+        $assetStatusCheck = AssetStatus::withTrashed()->where(function ($query) use ($user, $validated){
+            $query->where('user_id', $user->id);
+            $query->where('name', $validated['name']);
+        })->first();
+
+        if($assetStatusCheck)
+        {
+            if($assetStatusCheck->trashed())
+            {
+                $assetStatusCheck->restore();
+                $this->authorize('delete', $assetStatus);
+                $assetStatus->delete();
+                return back()->with('success', 'Asset status edited successfully!');
+            }
+            else
+            {
+                return back()->with('error', 'Asset status already exists!');
+            }
+
+        }
 
         $assetStatus->update($validated);
 

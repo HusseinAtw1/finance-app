@@ -77,6 +77,30 @@ class AssetTypeController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
+        $validated['name'] = ucfirst(strtolower($validated['name']));
+
+        $user = Auth::user();
+
+        $assetTypeCheck = AssetType::withTrashed()->where(function ($query) use ($user, $validated){
+            $query->where('user_id', $user->id);
+            $query->where('name', $validated['name']);
+        })->first();
+
+        if($assetTypeCheck)
+        {
+            if($assetTypeCheck->trashed())
+            {
+                $assetTypeCheck->restore();
+                $this->authorize('delete', $assetType);
+                $assetType->delete();
+                return back()->with('success', 'Asset type updated successfully!');
+            }
+            else
+            {
+                return back()->with('error', 'Asset type already exists!');
+            }
+        }
+
         $assetType->update($validated);
 
         return redirect()->back()->with('success', 'Asset Type updated successfully!');

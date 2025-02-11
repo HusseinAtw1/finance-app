@@ -64,6 +64,8 @@ class AssetCategoryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
+        $validated['name'] = ucfirst(strtolower($validated['name']));
+
         $assetCategoryCheck = AssetCategory::withTrashed()->where(function ($query) use($user, $validated){
             $query->where('user_id', $user->id);
             $query->where('name', $validated['name']);
