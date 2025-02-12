@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('transactionable_id')->nullable();
             $table->string('transactionable_type')->nullable();
+            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
             $table->enum('type', ['credit', 'debit']);
             $table->decimal('amount', 15, 2);
             $table->text('description')->nullable();

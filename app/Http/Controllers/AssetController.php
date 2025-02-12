@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Asset;
 use App\Models\Account;
 use App\Models\Currency;
@@ -10,7 +11,10 @@ use App\Models\AssetStatus;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\AssetCategory;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Date;
+
 
 class AssetController extends Controller
 {
@@ -64,52 +68,71 @@ class AssetController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name'           => 'required|string|max:255',
-            'type'           => 'required|string|in:cash,investment,property',
-            'current_value'  => 'required|numeric|min:0',
-            'purchase_date'  => 'nullable|date',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'category'       => 'nullable|in:fixed,liquid',
-            'location'       => 'nullable|string|max:255',
-            'notes'          => 'nullable|string',
-            'account_id'     => 'required|exists:accounts,id',
-        ]);
-
         $user = Auth::user();
 
-        // Create the asset
-        $asset = Asset::create([
+        $status = AssetStatus::find($request->status);
+
+        $request->validate([
+            'account_id'     => 'required|exists:accounts,id',
+            'name'           => 'required|string|max:255',
+            'location'       => 'required|string|max:255',
+            'purchase_date' => ['required', 'date', 'before:' . Carbon::now()->setTimezone($user->timezone)->format('Y-m-d H:i:s')],
+            'current_value'  => 'required|numeric|min:0',
+            'purchase_price' => 'required|numeric|min:0',
+            'category'       => ['required', 'integer', Rule::exists('asset_categories', 'id')],
+            'status'         => ['required', 'integer', Rule::exists('asset_statuses', 'id')],
+            'type'           => ['required', 'integer', Rule::exists('asset_types', 'id')],
+            'currency'       => ['required', 'integer', Rule::exists('currencies', 'id')],
+            'quantity'       => 'required|integer|min:1',
+            'notes'          => 'nullable|string',
+            'sold_for'       => ['nullable', 'numeric', 'min:0', Rule::requiredIf($status && $status->name === 'Sold')],
+        ]);
+
+        $purchaseDate = Carbon::parse($request->purchase_date, $user->timezone)->setTimezone('UTC');
+
+        Asset::create([
             'user_id'        => $user->id,
             'account_id'     => $request->account_id,
+            'currency_id'    => $request->currency,
+            'asset_type_id'  => $request->type,
+            'asset_category_id'=> $request->category,
+            'asset_status_id'=> $request->status,
             'name'           => $request->name,
-            'type'           => $request->type,
+            'quantity'       => $request->quantity,
             'current_value'  => $request->current_value,
-            'purchase_date'  => $request->purchase_date,
             'purchase_price' => $request->purchase_price,
-            'category'       => $request->category,
             'location'       => $request->location,
             'notes'          => $request->notes,
+            'purchase_at'    => $purchaseDate,
+            'created_at'     => now(),
         ]);
 
-        // Determine the transaction amount:
-        // Use purchase price if provided, otherwise current value.
+        Transaction::create([
+            'user_id'               =>  $user->id,
+            'account_id'            =>  $request->account_id,
+            'transactionable_type'  =>  Asset::class,
+            'status'                =>  'completed',
+            'type'                  =>  'debit',
+            'amount'                =>  $request->quantity * $request->current_value,
+            'description'           =>  'Bought '.$request->quantity.' of '.$request->name.' for '.$request->purchase_price,
+        ]);
+
+        if($status && $status->name === 'Sold')
+        {
+            Transaction::create([
+                'user_id'               =>  $user->id,
+                'account_id'            =>  $request->account_id,
+                'transactionable_type'  =>  Asset::class,
+                'status'                =>  'completed',
+                'type'                  =>  'credit',
+                'amount'                =>  $request->quantity * $request->sold_for,
+                'transaction_date'      =>  $purchaseDate,
+                'description'           =>  'Sold '.$request->quantity.' of '.$request->name.' for '.$request->sold_for,
+            ]);
+        }
+
         $transactionAmount = $request->purchase_price ?? $request->current_value;
 
-        // Create a corresponding transaction using polymorphic relationships
-        Transaction::create([
-            'user_id'              => $user->id,
-            'account_id'           => $request->account_id,
-            'transactionable_id'   => $asset->id,
-            'transactionable_type' => Asset::class,
-            'amount'               => $transactionAmount,
-            'type'                 => 'debit', // Asset purchase is recorded as a debit transaction
-            'description'          => "Purchased asset: {$request->name}",
-            'transaction_date'     => $request->purchase_date,
-        ]);
-
-        // Update the account balance by deducting the transaction amount.
-        // (Assumes purchasing an asset decreases your cash balance.)
         $account = Account::find($request->account_id);
         if ($account) {
             $account->balance -= $transactionAmount;
@@ -121,8 +144,8 @@ class AssetController extends Controller
 
     public function detail($id)
     {
-        $asset = Asset::findOrFail($id); // Fetch the asset by ID
-        return view('assets.detail', compact('asset')); // Pass data to the view
+        $asset = Asset::findOrFail($id);
+        return view('assets.detail', compact('asset'));
     }
 
     public function sell(Request $request, $id)

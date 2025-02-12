@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -32,12 +33,19 @@ return new class extends Migration
 
         Schema::create('asset_statuses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->string('name'); // e.g., 'active', 'pending', 'sold', 'inactive', 'archived', 'suspended', etc.
+            $table->string('name')->unique(); // e.g., 'active', 'pending', 'sold', 'inactive', 'archived', 'suspended', etc.
             $table->timestampsTz();
             $table->softDeletesTz();
-            $table->unique(['user_id', 'name']);
         });
+
+        DB::table('asset_statuses')->insert([
+            ['name' => 'Active',   'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Pending',  'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Sold',     'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Inactive', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Archived', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Suspended','created_at' => now(), 'updated_at' => now()],
+        ]);
 
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
@@ -48,12 +56,11 @@ return new class extends Migration
             $table->foreignId('asset_category_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_status_id')->constrained('asset_statuses')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
+            $table->integer('quantity')->unsigned()->default(1);
             $table->decimal('current_value', 15, 2)->unsigned();
             $table->decimal('purchase_price', 15, 2)->unsigned()->nullable();
-            $table->decimal('sell_price', 15, 2)->unsigned()->nullable();
             $table->string('location')->nullable();
             $table->text('notes')->nullable();
-            $table->timestampTz('sell_at')->nullable();
             $table->timestampTz('purchase_at')->useCurrent();
             $table->timestampsTz();
             $table->softDeletesTz();
@@ -70,8 +77,7 @@ return new class extends Migration
             $table->decimal('value', 15, 2)->unsigned();
             $table->timestampTz('recorded_at')->useCurrent();
             $table->timestampsTz();
-
-            $table->index('asset_id'); // Single index
+            $table->index('asset_id');
         });
     }
 

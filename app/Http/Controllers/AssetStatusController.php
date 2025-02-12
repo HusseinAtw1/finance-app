@@ -13,10 +13,7 @@ class AssetStatusController extends Controller
     {
         $user = Auth::user();
 
-        $statuses = AssetStatus::where(function($query) use ($user)
-        {
-            $query->where('user_id', $user->id);
-        })->get();
+        $statuses = AssetStatus::all();
 
         return view('assets.status', compact('statuses'));
     }
@@ -32,7 +29,6 @@ class AssetStatusController extends Controller
         $user = Auth::user();
         $assetStatus = AssetStatus::withTrashed()->where(function($query) use ($user, $validated) {
             $query->where('name', $validated['name']);
-            $query->where('user_id', $user->id);
         })->first();
 
         if($assetStatus)
@@ -49,7 +45,6 @@ class AssetStatusController extends Controller
             }
         }
         AssetStatus::create([
-            'user_id' => $user->id,
             'name' => $validated['name'],
         ]);
 
@@ -79,7 +74,6 @@ class AssetStatusController extends Controller
         $validated['name'] = ucfirst(strtolower($validated['name']));
 
         $assetStatusCheck = AssetStatus::withTrashed()->where(function ($query) use ($user, $validated){
-            $query->where('user_id', $user->id);
             $query->where('name', $validated['name']);
         })->first();
 

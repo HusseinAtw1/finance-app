@@ -32,6 +32,8 @@
             border-color: #0056b3;
         }
 
+
+
     </style>
     <title>REGISTER</title>
 </head>
@@ -55,6 +57,27 @@
             </div>
 
             <div class="mb-3">
+                <label for="timezone" class="form-label d-block"><b>Select Timezone</b></label>
+                <select name="timezone" id="timezone" class="form-select" required>
+                    @php
+                        $timezones = [];
+                        foreach (DateTimeZone::listIdentifiers() as $timezone) {
+                            $time = new DateTime('now', new DateTimeZone($timezone));
+                            $offset = $time->format('P');
+                            $city = substr($timezone, strrpos($timezone, '/') + 1);
+                            $city = str_replace('_', ' ', $city);
+                            $timezones[$timezone] = "{$city} (UTC{$offset})";
+                        }
+                        asort($timezones);
+                    @endphp
+
+                    @foreach ($timezones as $timezone => $display)
+                        <option value="{{ $timezone }}">{{ $display }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
                 <label for="password" class="form-label"><b>Password:</b></label>
                 <input type="password" name="password" class="form-control" required>
             </div>
@@ -71,6 +94,7 @@
             <div class="text-center">
                 <a href="/login" class="text-primary">Already have an account ? Login here</a>
             </div>
+
         </form>
     </div>
 </body>

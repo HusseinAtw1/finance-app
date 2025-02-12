@@ -16,21 +16,22 @@ class RegisteredUserController extends Controller
 
     public function store()
     {
-        // validate the input
         $validatedAttributes = request()->validate([
-            'name' => ['required'],
-            'email' => ['required', 'max:255', 'email'],
-            'password' => ['required', Password::min(8), 'confirmed'], // password confirmation
+            'name'     => ['required'],
+            'email'    => ['required', 'email', 'max:255'],
+            'timezone' => ['required', function($attribute, $value, $fail) {
+                if (!in_array($value, \DateTimeZone::listIdentifiers())) {
+                    $fail('The selected timezone is invalid.');
+                }
+            }],
+            'password' => ['required', Password::min(8), 'confirmed'],
         ]);
 
-        // create the user
         $user = User::create($validatedAttributes);
 
-        // login the user
         Auth::Login($user);
 
-        // pass the user data to the view
-        return redirect('/')->with('user', $user);  // Redirect and pass the user data
+        return redirect('/')->with('user', $user);
     }
 
 }

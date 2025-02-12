@@ -27,12 +27,11 @@ class CurrencyController extends Controller
             'symbol' => ['nullable', 'string'],
         ]);
 
-        $currency = Currency::create([
+        Currency::create([
             'user_id'   => $user->id,
             'name'      => $validated['name'],
             'full_name' => $validated['full_name'],
             'symbol'    => $validated['symbol'] ?? null,
-            'active'    => true,
         ]);
 
         return redirect()->back()->with('success', 'Currency created successfully!');
