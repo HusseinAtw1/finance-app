@@ -30,7 +30,7 @@ class AssetController extends Controller
 
         $search = $request->input('search');
 
-        $assets = Asset::where('user_id', $user->id)->when($selectedAccount, function ($query, $selectedAccount)
+        $assets = Asset::with('assetStatus')->where('user_id', $user->id)->when($selectedAccount, function ($query, $selectedAccount)
             {
                 return $query->where('account_id', $selectedAccount);
             })->when($status === 'sold', function ($query)
