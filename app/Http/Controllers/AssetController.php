@@ -30,27 +30,36 @@ class AssetController extends Controller
 
         $search = $request->input('search');
 
-        $assets = Asset::where('user_id', $user->id)->when($selectedAccount, function ($query, $selectedAccount) {
-                    return $query->where('account_id', $selectedAccount);
-                })->when($status, function ($query, $status) {
-                    if ($status === 'sold')
-                    {
-                        return $query->onlyTrashed();
-                    }
-                    elseif ($status === 'owned')
-                    {
-                        return $query;
-                    }
-                return $query;
-                })->when($search, function ($query, $search) {
-                    return $query->where(function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('notes', 'like', "%{$search}%");
-                    });
-                })->paginate(9);
+        $assets = Asset::where('user_id', $user->id)->when($selectedAccount, function ($query, $selectedAccount)
+            {
+                return $query->where('account_id', $selectedAccount);
+            })->when($status === 'sold', function ($query)
+            {
+                return $query->whereHas('assetStatus', function ($q)
+                {
+                    $q->where('name', 'Sold');
+                });
+            })->when($status === 'owned', function ($query)
+            {
+                return $query->whereDoesntHave('assetStatus', function ($q)
+                {
+                    $q->where('name', 'Sold');
+                });
+            })
+            ->when($search, function ($query, $search)
+            {
+                return $query->where(function ($q) use ($search)
+                {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('notes', 'like', "%{$search}%");
+                });
+            })
+            ->paginate(9);
 
         return view('assets.assets', compact('assets', 'accounts', 'selectedAccount', 'status', 'search'));
     }
+
+
 
     public function create()
     {
@@ -86,6 +95,7 @@ class AssetController extends Controller
             'quantity'       => 'required|integer|min:1',
             'notes'          => 'nullable|string',
             'sold_for'       => ['nullable', 'numeric', 'min:0', Rule::requiredIf($status && $status->name === 'Sold')],
+            'sold_at'        => ['nullable', 'date', Rule::requiredIf($status && $status->name === 'Sold')],
         ]);
 
         $purchaseDate = Carbon::parse($request->purchase_date, $user->timezone)->setTimezone('UTC');
@@ -126,7 +136,7 @@ class AssetController extends Controller
                 'status'                =>  'completed',
                 'type'                  =>  'credit',
                 'amount'                =>  $request->quantity * $request->sold_for,
-                'transaction_date'      =>  $purchaseDate,
+                'transaction_date'      =>  $request->sold_at,
                 'description'           =>  'Sold '.$request->quantity.' of '.$request->name.' for '.$request->sold_for,
             ]);
         }

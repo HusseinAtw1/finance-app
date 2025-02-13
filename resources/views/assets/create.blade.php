@@ -116,6 +116,13 @@
                 </div>
             </div>
 
+            <div class="col-md-6" id="sold-date" style="display: none;">
+                <div class="form-floating">
+                    <input type="datetime-local" class="form-control" id="sold_at" name="sold_at" placeholder="Sold Date">
+                    <label for="sold_for">Sold Date</label>
+                </div>
+            </div>
+
             <div class="col-md-6">
                 <div class="form-floating">
                     <select class="form-select" id="currency" name="currency" required>
@@ -158,6 +165,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const statusSelect = document.getElementById('status');
         const soldField = document.getElementById('sold-field');
+        const soldDate = document.getElementById('sold-date');
         toggleSoldField();
         statusSelect.addEventListener('change', toggleSoldField);
 
@@ -165,8 +173,10 @@
             const selectedText = statusSelect.options[statusSelect.selectedIndex].text.trim();
             if (selectedText === 'Sold') {
                 soldField.style.display = 'block';
+                soldDate.style.display = 'block';
             } else {
                 soldField.style.display = 'none';
+                soldDate.style.display = 'none';
             }
         }
     });
