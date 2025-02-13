@@ -80,5 +80,5 @@ Route::put('expenses/{expense}/pay', [ExpenseController::class, 'pay'])->name('e
 Route::get('/currencies', [CurrencyController::class, 'index'])->name('currencies.currencies')->middleware('auth');
 Route::post('/currencies', [CurrencyController::class, 'store'])->name('currencies.store')->middleware('auth');
 Route::delete('/currencies/{currency}', [CurrencyController::class, 'destroy'])->name('currencies.destroy');
-
+Route::put('/currencies/{currency}', [CurrencyController::class, 'update'])->name('currencies.update');
 
