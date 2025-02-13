@@ -90,10 +90,8 @@
                     <div class="col-md-6">
                         <label for="sell_price" class="form-label">Selling Price <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <span class="input-group-text">{{ optional($asset->currency)->symbol ?? '$' }}</span>
-                            <input type="number" step="0.01" id="sell_price" name="sell_price"
-                                   class="form-control @error('sell_price') is-invalid @enderror"
-                                   placeholder="Enter selling price" value="{{ old('sell_price') }}" required>
+                            <span class="input-group-text" id="currencySymbol">{{ optional($asset->currency)->symbol ?? '$' }}</span>
+                            <input type="number" step="0.01" id="sell_price" name="sell_price" class="form-control @error('sell_price') is-invalid @enderror" placeholder="Enter selling price" value="{{ old('sell_price') }}" required>
                             @error('sell_price')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -102,10 +100,34 @@
 
                     <div class="col-md-6">
                         <label for="sold_at" class="form-label">Sale Date <span class="text-danger">*</span></label>
-                        <input type="datetime-local" id="sold_at" name="sold_at"
-                               class="form-control @error('sold_at') is-invalid @enderror"
-                               value="{{ old('sold_at') }}" required>
+                        <input type="datetime-local" id="sold_at" name="sold_at"class="form-control @error('sold_at') is-invalid @enderror" value="{{ old('sold_at') }}" required>
                         @error('sold_at')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="currency" class="form-label">Currency <span class="text-danger">*</span></label>
+                        <select name="currency" id="currency" class="form-select">
+                            <option value="" data-symbol="$" selected>Choose a Currency</option>
+                            @foreach ($currencies as $currency)
+                                <option value="{{ $currency->id }}" data-symbol="{{ $currency->symbol }}">
+                                    {{ $currency->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('currency')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label for="quantity" class="form-label">Quantity Sold <span class="text-danger">*</span></label>
+                        <input type="number" id="quantity" name="quantity"
+                               class="form-control @error('quantity') is-invalid @enderror"
+                               value="{{ old('quantity') }}" required>
+                        @error('quantity')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -149,4 +171,23 @@
         background-color: #e9ecef;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const currencySelect = document.getElementById('currency');
+        const currencySymbol = document.getElementById('currencySymbol');
+
+        currencySelect.addEventListener('change', function () {
+            // Get the selected option
+            const selectedOption = this.options[this.selectedIndex];
+            // Retrieve its data-symbol attribute
+            const symbol = selectedOption.getAttribute('data-symbol') || '$';
+            // Update the text content of the currency symbol span
+            currencySymbol.textContent = symbol;
+        });
+    });
+</script>
 @endsection

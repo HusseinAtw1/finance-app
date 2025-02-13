@@ -13,8 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\AssetCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Date;
-
+use Illuminate\Validation\Rules\Exists;
 
 class AssetController extends Controller
 {
@@ -161,52 +160,50 @@ class AssetController extends Controller
 
     public function sell(Request $request, $id)
     {
-        // Validate incoming data. Ensure account_id is provided if it's required.
-        $validated = $request->validate([
-            'sell_price' => ['required', 'numeric', 'min:0.01'],
-            'sold_at'    => ['required', 'date'],
-            'account_id' => ['required', 'exists:accounts,id'], // if account_id is needed for transactions
-        ]);
-
-        // Retrieve the asset
-        $asset = Asset::findOrFail($id);
-
-        // Update the asset to mark it as sold.
-        // Notice: We mark the asset as no longer owned.
-        $asset->update([
-            'owns'       => false,
-            'sell_price' => $validated['sell_price'],
-            'sell_date'  => $validated['sold_at']
-        ]);
-
-        // Get the authenticated user.
         $user = Auth::user();
 
-        // The transaction amount will be the sell price.
-        $transactionAmount = $validated['sell_price'];
+        $asset = Asset::findOrFail($id);
 
-        // Create a new transaction record.
+        $validated = $request->validate([
+            'sell_price' => ['required', 'numeric', 'min:0'],
+            'sold_at'    => ['required', 'date', 'before:' . Carbon::now()->setTimezone($user->timezone)->format('Y-m-d H:i:s')],
+            'account_id' => ['required', 'exists:accounts,id'],
+            'currency'   => ['required', 'string', Rule::exists('currencies', 'id')],
+            'quantity'   => ['required', 'integer', 'min:0', 'max:' . $asset->quantity],
+        ]);
+
+        $status = AssetStatus::where('name', 'Sold')->first();
+
+        $quantity = $asset->quantity - $validated['quantity'];
+
+        $asset->update([
+            'quantity' => $quantity,
+            'asset_status_id'   => $quantity === 0 ? $status->id : $asset->asset_status_id,
+        ]);
+
+        $transactionAmount = $validated['sell_price'] * $validated['quantity'];
+
+        $currency = Currency::find($validated['currency']);
+
         Transaction::create([
             'user_id'              => $user->id,
             'account_id'           => $validated['account_id'],
             'transactionable_id'   => $asset->id,
             'transactionable_type' => Asset::class,
+            'status'               => 'completed',
             'amount'               => $transactionAmount,
-            'type'                 => 'credit', // For a sale, it’s a credit transaction.
-            'description'          => "Sold asset: {$asset->name}",
+            'type'                 => 'credit',
+            'description'          => "Sold asset: {$asset->name}, Quantity: {$validated['quantity']}, Price: {$validated['sell_price']}, Currency: {$currency->name}" . ($currency->symbol ? " ({$currency->symbol})" : ""),
             'transaction_date'     => $validated['sold_at'],
         ]);
 
-        // Update the account balance by adding the sell price.
-        // (Selling an asset increases your cash balance.)
         $account = Account::find($validated['account_id']);
+
         if ($account) {
             $account->balance += $transactionAmount;
             $account->save();
         }
 
-        // Redirect back with a success message.
-        return redirect()->route('assets.show', $id)
-                         ->with('success', 'Asset sold successfully!');
+        return redirect()->route('assets.show', $id)->with('success', 'Asset sold successfully!');
     }
 }

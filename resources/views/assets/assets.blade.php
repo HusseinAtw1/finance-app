@@ -53,9 +53,9 @@
 
                     </div>
                     <div class="card-body">
-                        <p class="card-text"><strong>Purchased Price:</strong> ${{ $asset->purchase_price }}</p>
-                        <p class="card-text"><strong>Current Value:</strong> ${{ $asset->current_value }}</p>
-                        <p class="card-text"><strong>Quantity left:</strong> ${{ $asset->quantity }}</p>
+                        <p class="card-text"><strong>Purchased Price:</strong> {{ $asset->purchase_price }} {{$asset->currency->symbol}}</p>
+                        <p class="card-text"><strong>Current Value:</strong> {{ $asset->current_value }} {{$asset->currency->symbol}}</p>
+                        <p class="card-text"><strong>Quantity left:</strong> {{ $asset->quantity }}</p>
                         <p class="card-text"><strong>Date:</strong> {{ $asset->created_at->format('d M, Y') }}</p>
                         @if ($asset->assetStatus->name === 'Sold')
                             <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-danger">Sold</span></p>
