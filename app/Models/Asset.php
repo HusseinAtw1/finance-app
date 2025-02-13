@@ -46,4 +46,9 @@ class Asset extends Model
     {
         return $this->hasMany(AssetValueHistory::class);
     }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
 }

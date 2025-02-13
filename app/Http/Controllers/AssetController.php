@@ -155,7 +155,8 @@ class AssetController extends Controller
     public function detail($id)
     {
         $asset = Asset::findOrFail($id);
-        return view('assets.detail', compact('asset'));
+        $currencies = Currency::all();
+        return view('assets.detail', compact('asset', 'currencies'));
     }
 
     public function sell(Request $request, $id)
