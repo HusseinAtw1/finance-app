@@ -47,15 +47,41 @@
 
             <div class="col-md-6">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="location" name="location" placeholder="" required>
-                    <label for="location">Location</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="">Choose a status</option>
+                        @foreach($assetStatuses as $status)
+                        <option value="{{$status->id}}">{{$status->name}}</option>
+                        @endforeach
+                    </select>
+                    <label for="status">Status</label>
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6" id="sold-field" style="display: none;">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="sold_for" name="sold_for" placeholder="Sold Details">
+                    <label for="sold_for">Sold Price</label>
+                </div>
+            </div>
+
+            <div class="col-md-6" id="sold-date" style="display: none;">
+                <div class="form-floating">
+                    <input type="datetime-local" class="form-control" id="sold_at" name="sold_at" placeholder="Sold Date">
+                    <label for="sold_for">Sold Date</label>
+                </div>
+            </div>
+
+            <div class="col-md-6" style="display: block" id="purchase_date_field">
                 <div class="form-floating">
                     <input type="datetime-local" class="form-control" id="purchase_date" name="purchase_date" placeholder="" required>
                     <label for="purchase_date">Purchase Date</label>
+                </div>
+            </div>
+
+            <div class="col-md-6" style="display: block" id="purchase_price_field">
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="purchase_price" name="purchase_price" step="0.01" placeholder="" required>
+                    <label for="purchase_price">Purchase Price ($)</label>
                 </div>
             </div>
 
@@ -63,13 +89,6 @@
                 <div class="form-floating">
                     <input type="number" class="form-control" id="current_value" name="current_value" step="0.01" placeholder="" required>
                     <label for="current_value">Current Value ($)</label>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="number" class="form-control" id="purchase_price" name="purchase_price" step="0.01" placeholder="" required>
-                    <label for="purchase_price">Purchase Price ($)</label>
                 </div>
             </div>
 
@@ -87,18 +106,6 @@
 
             <div class="col-md-6">
                 <div class="form-floating">
-                    <select class="form-select" id="status" name="status" required>
-                        <option value="">Choose a status</option>
-                        @foreach($assetStatuses as $status)
-                        <option value="{{$status->id}}">{{$status->name}}</option>
-                        @endforeach
-                    </select>
-                    <label for="status">Status</label>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-floating">
                     <select class="form-select" id="type" name="type" required>
                         <option value="">Choose a type</option>
                         @foreach ($assetTypes as $type)
@@ -106,20 +113,6 @@
                         @endforeach
                     </select>
                     <label for="type">Asset Type</label>
-                </div>
-            </div>
-
-            <div class="col-md-6" id="sold-field" style="display: none;">
-                <div class="form-floating">
-                    <input type="text" class="form-control" id="sold_for" name="sold_for" placeholder="Sold Details">
-                    <label for="sold_for">Sold Price</label>
-                </div>
-            </div>
-
-            <div class="col-md-6" id="sold-date" style="display: none;">
-                <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="sold_at" name="sold_at" placeholder="Sold Date">
-                    <label for="sold_for">Sold Date</label>
                 </div>
             </div>
 
@@ -139,6 +132,13 @@
                 <div class="form-floating">
                     <input type="number" id="quantity" name="quantity" class="form-control" placeholder="" required>
                     <label for="quantity">Quantity</label>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="location" name="location" placeholder="" required>
+                    <label for="location">Location</label>
                 </div>
             </div>
 
@@ -166,17 +166,33 @@
         const statusSelect = document.getElementById('status');
         const soldField = document.getElementById('sold-field');
         const soldDate = document.getElementById('sold-date');
+        const purchaseDate = document.getElementById('purchase_date_field');
+        const purchasePrice = document.getElementById('purchase_price_field');
         toggleSoldField();
         statusSelect.addEventListener('change', toggleSoldField);
 
         function toggleSoldField() {
             const selectedText = statusSelect.options[statusSelect.selectedIndex].text.trim();
-            if (selectedText === 'Sold') {
+            if (selectedText === 'Sold')
+            {
                 soldField.style.display = 'block';
                 soldDate.style.display = 'block';
-            } else {
+                purchaseDate.style.display = "block";
+                purchasePrice.style.display = "block";
+            }
+            else if (selectedText === 'Pending')
+            {
+                purchaseDate.style.display = "none";
+                purchasePrice.style.display = "none";
                 soldField.style.display = 'none';
                 soldDate.style.display = 'none';
+            }
+            else
+            {
+                soldField.style.display = 'none';
+                soldDate.style.display = 'none';
+                purchaseDate.style.display = "block";
+                purchasePrice.style.display = "block";
             }
         }
     });

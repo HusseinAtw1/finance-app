@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use App\Models\AssetCategory;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Exists;
 
 class AssetController extends Controller
 {
@@ -63,12 +62,15 @@ class AssetController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $accs = Account::where('user_id', $user->id)
-                    ->where('acc_type', 'asset')
-                    ->get();
+
+        $accs = Account::where('user_id', $user->id)->where('acc_type', 'asset')->get();
+
         $currencies = Currency::all();
+
         $assetStatuses = AssetStatus::all();
+
         $assetCategories = AssetCategory::all();
+
         $assetTypes = AssetType::all();
 
         return view('assets.create', compact('accs', 'currencies', 'assetStatuses', 'assetCategories', 'assetTypes'));
@@ -84,9 +86,9 @@ class AssetController extends Controller
             'account_id'     => 'required|exists:accounts,id',
             'name'           => 'required|string|max:255',
             'location'       => 'required|string|max:255',
-            'purchase_date' => ['required', 'date', 'before:' . Carbon::now()->setTimezone($user->timezone)->format('Y-m-d H:i:s')],
+            'purchase_date' => ['nullable', 'date', 'before:' . Carbon::now()->setTimezone($user->timezone)->format('Y-m-d H:i:s'), Rule::requiredIf($status && $status->name !== 'Pending')],
             'current_value'  => 'required|numeric|min:0',
-            'purchase_price' => 'required|numeric|min:0',
+            'purchase_price' => ['nullable', 'numeric', 'min:0', Rule::requiredIf($status && $status->name !== 'Pending')],
             'category'       => ['required', 'integer', Rule::exists('asset_categories', 'id')],
             'status'         => ['required', 'integer', Rule::exists('asset_statuses', 'id')],
             'type'           => ['required', 'integer', Rule::exists('asset_types', 'id')],
@@ -116,15 +118,27 @@ class AssetController extends Controller
             'created_at'     => now(),
         ]);
 
-        Transaction::create([
-            'user_id'               =>  $user->id,
-            'account_id'            =>  $request->account_id,
-            'transactionable_type'  =>  Asset::class,
-            'status'                =>  'completed',
-            'type'                  =>  'debit',
-            'amount'                =>  $request->quantity * $request->current_value,
-            'description'           =>  'Bought '.$request->quantity.' of '.$request->name.' for '.$request->purchase_price,
-        ]);
+        $account = Account::find($request->account_id);
+
+        if ($status && in_array($status->name, ['Active', 'Inactive', 'Archived', 'Suspended', 'Sold']))
+        {
+            Transaction::create([
+                'user_id'               =>  $user->id,
+                'account_id'            =>  $request->account_id,
+                'transactionable_type'  =>  Asset::class,
+                'status'                =>  'completed',
+                'type'                  =>  'debit',
+                'amount'                =>  $request->quantity * $request->current_value,
+                'description'           =>  'Bought '.$request->quantity.' of '.$request->name.' for '.$request->purchase_price,
+            ]);
+
+            $transactionAmount = $request->purchase_price * $request->quantity;
+
+            if ($account) {
+                $account->balance -= $transactionAmount;
+                $account->save();
+            }
+        }
 
         if($status && $status->name === 'Sold')
         {
@@ -138,14 +152,13 @@ class AssetController extends Controller
                 'transaction_date'      =>  $request->sold_at,
                 'description'           =>  'Sold '.$request->quantity.' of '.$request->name.' for '.$request->sold_for,
             ]);
-        }
 
-        $transactionAmount = $request->purchase_price ?? $request->current_value;
+            $transactionAmount = $request->sold_for * $request->quantity;
 
-        $account = Account::find($request->account_id);
-        if ($account) {
-            $account->balance -= $transactionAmount;
-            $account->save();
+            if ($account) {
+                $account->balance += $transactionAmount;
+                $account->save();
+            }
         }
 
         return redirect()->route('assets.show')->with('success', 'Asset added successfully and transaction recorded!');
