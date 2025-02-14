@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
 use App\Models\AssetType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,6 +105,11 @@ class AssetTypeController extends Controller
         $assetType->update($validated);
 
         return redirect()->back()->with('success', 'Asset Type updated successfully!');
+    }
+
+    public function showUpdate(Asset $asset)
+    {
+
     }
 
 }

@@ -17,7 +17,7 @@ class Asset extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function transactions()
+    public function transactionInfo()
     {
         return $this->morphMany(Transaction::class, 'transactionable');
     }

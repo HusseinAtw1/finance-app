@@ -43,14 +43,16 @@
         @forelse ($assets as $asset)
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>{{ $asset->name }}</span>
-                        @if ($asset->assetStatus->name === 'Sold')
-                            <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-primary btn-sm">View</a>
-                        @else
-                            <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-danger btn-sm">Sell</a>
-                        @endif
-
+                    <div class="card-header d-flex align-items-center">
+                        <span class="me-auto">{{ $asset->name }}</span>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('asset_update.show', $asset->id )}}" class="btn btn-success btn-sm">Update</a>
+                            @if ($asset->assetStatus->name === 'Sold')
+                                <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-primary btn-sm">View</a>
+                            @else
+                                <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-danger btn-sm">Sell</a>
+                            @endif
+                        </div>
                     </div>
                     <div class="card-body">
                         <p class="card-text"><strong>Purchased Price:</strong> {{ $asset->purchase_price }} {{$asset->currency->symbol}}</p>
@@ -59,6 +61,8 @@
                         <p class="card-text"><strong>Date:</strong> {{ $asset->created_at->format('d M, Y') }}</p>
                         @if ($asset->assetStatus->name === 'Sold')
                             <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-danger">Sold</span></p>
+                        @elseif (in_array($asset->assetStatus->name, ['Inactive', 'Archived', 'Suspended']))
+                            <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-warning">{{$asset->assetStatus->name}}</span></p>
                         @else
                             <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-success">{{$asset->assetStatus->name}}</span></p>
                         @endif
