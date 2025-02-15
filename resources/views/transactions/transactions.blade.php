@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container my-5">
-    <h1>Transactions</h1>
+    <div class="d-flex justify-content-between align-items-center w-100">
+        <h1>Transactions</h1>
+        <a href="{{ route('create_transaction.show')}}" class="btn btn-primary">Create Transaction</a>
+    </div>
 
     <form method="GET" action="{{ route('transactions.show') }}" class="mb-4">
         <div class="row">

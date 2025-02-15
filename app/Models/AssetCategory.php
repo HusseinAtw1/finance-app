@@ -16,4 +16,9 @@ class AssetCategory extends Model
         return $this->hasMany(Asset::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

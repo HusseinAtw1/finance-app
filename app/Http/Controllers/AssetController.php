@@ -79,89 +79,30 @@ class AssetController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-
-        $status = AssetStatus::find($request->status);
-
+        $request['reference_number'] = strtoupper($request['reference_number']);
         $request->validate([
-            'account_id'     => 'required|exists:accounts,id',
+            'reference_number' => 'required|string|max:255',
             'name'           => 'required|string|max:255',
-            'location'       => 'required|string|max:255',
-            'purchase_date' => ['nullable', 'date', 'before:' . Carbon::now()->setTimezone($user->timezone)->format('Y-m-d H:i:s'), Rule::requiredIf($status && $status->name !== 'Pending')],
-            'current_value'  => 'required|numeric|min:0',
-            'purchase_price' => ['nullable', 'numeric', 'min:0', Rule::requiredIf($status && $status->name !== 'Pending')],
             'category'       => ['required', 'integer', Rule::exists('asset_categories', 'id')],
-            'status'         => ['required', 'integer', Rule::exists('asset_statuses', 'id')],
             'type'           => ['required', 'integer', Rule::exists('asset_types', 'id')],
-            'currency'       => ['required', 'integer', Rule::exists('currencies', 'id')],
-            'quantity'       => 'required|integer|min:1',
             'notes'          => 'nullable|string',
-            'sold_for'       => ['nullable', 'numeric', 'min:0', Rule::requiredIf($status && $status->name === 'Sold')],
-            'sold_at'        => ['nullable', 'date', Rule::requiredIf($status && $status->name === 'Sold')],
         ]);
 
-        $purchaseDate = Carbon::parse($request->purchase_date, $user->timezone)->setTimezone('UTC');
+        $status = AssetStatus::where('name', 'Pending')->firstOrFail();
 
         Asset::create([
-            'user_id'        => $user->id,
-            'account_id'     => $request->account_id,
-            'currency_id'    => $request->currency,
-            'asset_type_id'  => $request->type,
-            'asset_category_id'=> $request->category,
-            'asset_status_id'=> $request->status,
-            'name'           => $request->name,
-            'quantity'       => $request->quantity,
-            'current_value'  => $request->current_value,
-            'purchase_price' => $request->purchase_price,
-            'location'       => $request->location,
-            'notes'          => $request->notes,
-            'purchase_at'    => $purchaseDate,
-            'created_at'     => now(),
+            'user_id'           => $user->id,
+            'reference_number'  => $request->reference_number,
+            'asset_type_id'     => $request->type,
+            'asset_category_id' => $request->category,
+            'asset_status_id'   => $status->id,
+            'name'              => $request->name,
+            'notes'             => $request->notes,
+            'created_at'        => now(),
+            'updated_at'         => now(),
         ]);
 
-        $account = Account::find($request->account_id);
-
-        if ($status && in_array($status->name, ['Active', 'Inactive', 'Archived', 'Suspended', 'Sold']))
-        {
-            Transaction::create([
-                'user_id'               =>  $user->id,
-                'account_id'            =>  $request->account_id,
-                'transactionable_type'  =>  Asset::class,
-                'status'                =>  'completed',
-                'type'                  =>  'debit',
-                'amount'                =>  $request->quantity * $request->current_value,
-                'description'           =>  'Bought '.$request->quantity.' of '.$request->name.' for '.$request->purchase_price,
-            ]);
-
-            $transactionAmount = $request->purchase_price * $request->quantity;
-
-            if ($account) {
-                $account->balance -= $transactionAmount;
-                $account->save();
-            }
-        }
-
-        if($status && $status->name === 'Sold')
-        {
-            Transaction::create([
-                'user_id'               =>  $user->id,
-                'account_id'            =>  $request->account_id,
-                'transactionable_type'  =>  Asset::class,
-                'status'                =>  'completed',
-                'type'                  =>  'credit',
-                'amount'                =>  $request->quantity * $request->sold_for,
-                'transaction_date'      =>  $request->sold_at,
-                'description'           =>  'Sold '.$request->quantity.' of '.$request->name.' for '.$request->sold_for,
-            ]);
-
-            $transactionAmount = $request->sold_for * $request->quantity;
-
-            if ($account) {
-                $account->balance += $transactionAmount;
-                $account->save();
-            }
-        }
-
-        return redirect()->route('assets.show')->with('success', 'Asset added successfully and transaction recorded!');
+        return redirect()->route('assets.show')->with('success', 'Asset added successfully!');
     }
 
     public function detail($id)

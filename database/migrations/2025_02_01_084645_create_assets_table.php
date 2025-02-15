@@ -49,24 +49,23 @@ return new class extends Migration
 
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
+            $table->string('reference_number')->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('account_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('currency_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('currency_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_type_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_category_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_status_id')->constrained('asset_statuses')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
-            $table->integer('quantity')->unsigned()->default(1);
-            $table->decimal('current_value', 15, 2)->unsigned();
-            $table->decimal('purchase_price', 15, 2)->unsigned()->nullable();
+            $table->integer('quantity')->unsigned()->nullable();
+            $table->decimal('current_value', 15, 6)->nullable()->unsigned();
+            $table->decimal('purchase_price', 15, 6)->unsigned()->nullable();
             $table->string('location')->nullable();
             $table->text('notes')->nullable();
-            $table->timestampTz('purchase_at')->useCurrent();
+            $table->timestampTz('purchase_at')->nullable();
             $table->timestampsTz();
             $table->softDeletesTz();
-            $table->unique(['user_id', 'name']);
+            $table->unique(['name', 'reference_number']);
             $table->index('user_id');
-            $table->index('account_id');
             $table->index('currency_id');
             $table->index('asset_type_id');
         });

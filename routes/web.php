@@ -33,8 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/accounts/{account}/add-balance', [AccountController::class, 'addBalance'])->name('accounts.add-balance');
 });
 
-
-Route::get('/transactions', [TransactionController::class, 'show'])->middleware('auth')->name('transactions.show');
+Route::get('/transactions', [TransactionController::class, 'index'])->middleware('auth')->name('transactions.show');
+Route::get('/transactions/create', [TransactionController::class, 'show'])->middleware('auth')->name('create_transaction.show');
+Route::POST('/transactions/create', [TransactionController::class, 'store'])->middleware('auth')->name('transactions.store');
 
 Route::get('/asset_type', [AssetTypeController::class, 'show'])->name('asset_types.show')->middleware('auth');
 Route::POST('/asset_type/store', [AssetTypeController::class, 'store'])->name('asset_types.store')->middleware('auth');

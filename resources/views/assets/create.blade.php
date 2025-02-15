@@ -17,26 +17,6 @@
         <h2 class="mb-4 text-center">Add New Asset</h2>
         @csrf
 
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Select the account where you want to add this asset
-                </div>
-                <div class="form-floating">
-                    <select name="account_id" id="account_id" class="form-select" required>
-                        <option value="">Choose an account</option>
-                        @foreach ($accs as $account)
-                            <option value="{{ $account->id }}">
-                                {{ $account->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <label for="account_id">Select Account</label>
-                </div>
-            </div>
-        </div>
-
         <div class="row g-3">
             <div class="col-12">
                 <div class="form-floating">
@@ -45,62 +25,10 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12">
                 <div class="form-floating">
-                    <select class="form-select" id="status" name="status" required>
-                        <option value="">Choose a status</option>
-                        @foreach($assetStatuses as $status)
-                        <option value="{{$status->id}}">{{$status->name}}</option>
-                        @endforeach
-                    </select>
-                    <label for="status">Status</label>
-                </div>
-            </div>
-
-            <div class="col-md-6" id="sold-field" style="display: none;">
-                <div class="form-floating">
-                    <input type="text" class="form-control" id="sold_for" name="sold_for" placeholder="Sold Details">
-                    <label for="sold_for">Sold Price</label>
-                </div>
-            </div>
-
-            <div class="col-md-6" id="sold-date" style="display: none;">
-                <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="sold_at" name="sold_at" placeholder="Sold Date">
-                    <label for="sold_for">Sold Date</label>
-                </div>
-            </div>
-
-            <div class="col-md-6" style="display: block" id="purchase_date_field">
-                <div class="form-floating">
-                    <input type="datetime-local" class="form-control" id="purchase_date" name="purchase_date" placeholder="" required>
-                    <label for="purchase_date">Purchase Date</label>
-                </div>
-            </div>
-
-            <div class="col-md-6" style="display: block" id="purchase_price_field">
-                <div class="form-floating">
-                    <input type="number" class="form-control" id="purchase_price" name="purchase_price" step="0.01" placeholder="" required>
-                    <label for="purchase_price">Purchase Price ($)</label>
-                </div>
-            </div>
-
-           <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="number" class="form-control" id="current_value" name="current_value" step="0.01" placeholder="" required>
-                    <label for="current_value">Current Value ($)</label>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <select class="form-select" id="category" name="category" required>
-                        <option value="">Choose a category</option>
-                        @foreach($assetCategories as $cat)
-                        <option value="{{$cat->id}}">{{$cat->name}}</option>
-                        @endforeach
-                    </select>
-                    <label for="category">Category</label>
+                    <input type="text" class="form-control" id="reference_number" name="reference_number" placeholder="reference_number" required>
+                    <label for="reference_number">Reference Number</label>
                 </div>
             </div>
 
@@ -118,27 +46,13 @@
 
             <div class="col-md-6">
                 <div class="form-floating">
-                    <select class="form-select" id="currency" name="currency" required>
-                        <option value="">Choose a currency</option>
-                        @foreach($currencies as $curr)
-                        <option value="{{$curr->id}}">{{$curr->name}}</option>
+                    <select class="form-select" id="category" name="category" required>
+                        <option value="">Choose a category</option>
+                        @foreach($assetCategories as $cat)
+                        <option value="{{$cat->id}}">{{$cat->name}}</option>
                         @endforeach
                     </select>
-                    <label for="currency">Currency</label>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="number" id="quantity" name="quantity" class="form-control" placeholder="" required>
-                    <label for="quantity">Quantity</label>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <input type="text" class="form-control" id="location" name="location" placeholder="" required>
-                    <label for="location">Location</label>
+                    <label for="category">Asset Category</label>
                 </div>
             </div>
 
@@ -159,43 +73,5 @@
         </div>
     </div>
 </form>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const statusSelect = document.getElementById('status');
-        const soldField = document.getElementById('sold-field');
-        const soldDate = document.getElementById('sold-date');
-        const purchaseDate = document.getElementById('purchase_date_field');
-        const purchasePrice = document.getElementById('purchase_price_field');
-        toggleSoldField();
-        statusSelect.addEventListener('change', toggleSoldField);
-
-        function toggleSoldField() {
-            const selectedText = statusSelect.options[statusSelect.selectedIndex].text.trim();
-            if (selectedText === 'Sold')
-            {
-                soldField.style.display = 'block';
-                soldDate.style.display = 'block';
-                purchaseDate.style.display = "block";
-                purchasePrice.style.display = "block";
-            }
-            else if (selectedText === 'Pending')
-            {
-                purchaseDate.style.display = "none";
-                purchasePrice.style.display = "none";
-                soldField.style.display = 'none';
-                soldDate.style.display = 'none';
-            }
-            else
-            {
-                soldField.style.display = 'none';
-                soldDate.style.display = 'none';
-                purchaseDate.style.display = "block";
-                purchasePrice.style.display = "block";
-            }
-        }
-    });
-    </script>
 
 @endsection

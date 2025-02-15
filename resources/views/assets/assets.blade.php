@@ -46,7 +46,7 @@
                     <div class="card-header d-flex align-items-center">
                         <span class="me-auto">{{ $asset->name }}</span>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('asset_update.show', $asset->id )}}" class="btn btn-success btn-sm">Update</a>
+                            <a href="{{ route('asset_update.show', $asset->id )}}" class="btn btn-success btn-sm">Buy</a>
                             @if ($asset->assetStatus->name === 'Sold')
                                 <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-primary btn-sm">View</a>
                             @else
@@ -55,10 +55,10 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p class="card-text"><strong>Purchased Price:</strong> {{ $asset->purchase_price }} {{$asset->currency->symbol}}</p>
-                        <p class="card-text"><strong>Current Value:</strong> {{ $asset->current_value }} {{$asset->currency->symbol}}</p>
-                        <p class="card-text"><strong>Quantity left:</strong> {{ $asset->quantity }}</p>
-                        <p class="card-text"><strong>Date:</strong> {{ $asset->created_at->format('d M, Y') }}</p>
+                        <p class="card-text"><strong>Purchased Price:</strong> {{ $asset->purchase_price ?? 'N/A' }} {{$asset->currency->symbol ?? 'N/A'}}</p>
+                        <p class="card-text"><strong>Current Value:</strong> {{ $asset->current_value ?? 'N/A' }} {{$asset->currency->symbol ?? 'N/A'}}</p>
+                        <p class="card-text"><strong>Quantity left:</strong> {{ $asset->quantity ?? 'N/A' }}</p>
+                        <p class="card-text"><strong>Created Date:</strong> {{ $asset->created_at->format('d M, Y') }}</p>
                         @if ($asset->assetStatus->name === 'Sold')
                             <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-danger">Sold</span></p>
                         @elseif (in_array($asset->assetStatus->name, ['Inactive', 'Archived', 'Suspended']))

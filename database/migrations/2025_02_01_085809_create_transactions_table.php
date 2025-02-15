@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buyers', function (Blueprint $table){
+        Schema::create('suppliers', function (Blueprint $table){
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name')->unique();
             $table->timestampsTz();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('account_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('buyer_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('supplier_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
             $table->enum('type', ['credit', 'debit']);
             $table->decimal('total', 15, 6);
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->index('transaction_date');
             $table->index('user_id');
             $table->index('account_id');
-            $table->index('buyer_id');
+            $table->index('supplier_id');
         });
 
         Schema::create('transaction_info', function (Blueprint $table) {
@@ -41,9 +41,9 @@ return new class extends Migration
             $table->foreignId('transaction_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->morphs('transactionable');
             $table->integer('quantity')->unsigned();
-            $table->decimal('purchase_price', 15, 6)->unsigned();
-            $table->decimal('current_price', 15, 6)->unsigned();
-            $table->decimal('sold_for', 15, 6)->unsigned()->nullable();
+            $table->decimal('amount', 15, 6);
+            $table->decimal('purchase_price', 15, 6);
+            $table->decimal('current_price', 15, 6);
             $table->timestampsTz();
             $table->index('transaction_id');
             $table->index(['transactionable_id', 'transactionable_type']);

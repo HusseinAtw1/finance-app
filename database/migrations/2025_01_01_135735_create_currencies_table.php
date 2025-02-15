@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name', 3);
             $table->string('full_name');
             $table->string('symbol')->nullable();
+            $table->decimal('exchange_rate', 15, 6);
             $table->timestamps();
             $table->softDeletes();
             $table->unique(['user_id', 'name']);
