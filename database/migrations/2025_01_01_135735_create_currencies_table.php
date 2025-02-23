@@ -22,6 +22,15 @@ return new class extends Migration
             $table->softDeletes();
             $table->unique(['user_id', 'name']);
         });
+
+        Schema::create('exchange_histories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('currency_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->decimal('old_exchange_rate', 15, 6);
+            $table->decimal('new_exchange_rate', 15, 6);
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -29,6 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('exchange_histories');
         Schema::dropIfExists('currencies');
     }
 };

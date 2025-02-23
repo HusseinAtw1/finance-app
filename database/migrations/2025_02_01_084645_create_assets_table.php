@@ -47,14 +47,22 @@ return new class extends Migration
             ['name' => 'Suspended','created_at' => now(), 'updated_at' => now()],
         ]);
 
+        Schema::create('asset_depreciations', function (Blueprint $table) {
+            $table->id();
+            $table->string('method')->unique();
+            $table->timestampsTz();
+        });
+
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number')->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('currency_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->decimal('currency_exchange_rate', 15, 6)->unsigned()->nullable();
             $table->foreignId('asset_type_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_category_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_status_id')->constrained('asset_statuses')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('asset_depreciation_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
             $table->integer('quantity')->unsigned()->nullable();
             $table->decimal('current_value', 15, 6)->nullable()->unsigned();

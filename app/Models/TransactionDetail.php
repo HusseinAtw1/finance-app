@@ -4,15 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TransactionInfo extends Model
+class TransactionDetail extends Model
 {
-    protected $fillable = [
-        'transaction_id',
-        'quantity',
-        'purchase_price',
-        'current_price',
-        'sold_for'
-    ];
+    protected $guarded = [];
 
     public function transaction()
     {

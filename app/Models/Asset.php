@@ -51,4 +51,9 @@ class Asset extends Model
     {
         return $this->belongsTo(Currency::class);
     }
+
+    public function assetDepreciation()
+    {
+        return $this->belongsTo(AssetDepreciation::class);
+    }
 }

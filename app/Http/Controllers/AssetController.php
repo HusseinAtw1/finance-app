@@ -76,35 +76,6 @@ class AssetController extends Controller
         return view('assets.create', compact('accs', 'currencies', 'assetStatuses', 'assetCategories', 'assetTypes'));
     }
 
-    public function store(Request $request)
-    {
-        $user = Auth::user();
-        $request['reference_number'] = strtoupper($request['reference_number']);
-        $request->validate([
-            'reference_number' => 'required|string|max:255',
-            'name'           => 'required|string|max:255',
-            'category'       => ['required', 'integer', Rule::exists('asset_categories', 'id')],
-            'type'           => ['required', 'integer', Rule::exists('asset_types', 'id')],
-            'notes'          => 'nullable|string',
-        ]);
-
-        $status = AssetStatus::where('name', 'Pending')->firstOrFail();
-
-        Asset::create([
-            'user_id'           => $user->id,
-            'reference_number'  => $request->reference_number,
-            'asset_type_id'     => $request->type,
-            'asset_category_id' => $request->category,
-            'asset_status_id'   => $status->id,
-            'name'              => $request->name,
-            'notes'             => $request->notes,
-            'created_at'        => now(),
-            'updated_at'         => now(),
-        ]);
-
-        return redirect()->route('assets.show')->with('success', 'Asset added successfully!');
-    }
-
     public function detail($id)
     {
         $asset = Asset::findOrFail($id);

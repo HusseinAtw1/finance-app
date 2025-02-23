@@ -34,8 +34,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/transactions', [TransactionController::class, 'index'])->middleware('auth')->name('transactions.show');
-Route::get('/transactions/create', [TransactionController::class, 'show'])->middleware('auth')->name('create_transaction.show');
-Route::POST('/transactions/create', [TransactionController::class, 'store'])->middleware('auth')->name('transactions.store');
+Route::POST('/transactions/create', [TransactionController::class, 'createNewTransaction'])->middleware('auth')->name('create_transaction.create');
+Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->middleware('auth')->name('transaction_create.show');
+Route::POST('/transaction/{transaction}', [TransactionController::class, 'buyAsset'])->middleware('auth')->name("transaction_asset.store");
+Route::PATCH('/transaction/{transaction}', [TransactionController::class, 'sellAsset'])->middleware('auth')->name("transaction_asset.sell");
+
+
 
 Route::get('/asset_type', [AssetTypeController::class, 'show'])->name('asset_types.show')->middleware('auth');
 Route::POST('/asset_type/store', [AssetTypeController::class, 'store'])->name('asset_types.store')->middleware('auth');
