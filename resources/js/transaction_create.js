@@ -17,7 +17,11 @@ const customerNameDiv     = document.getElementById('customerNameDiv');
 const customerNumberDiv   = document.getElementById('customerNumberDiv');
 const soldForDiv          = document.getElementById('soldForDiv');
 const notesDiv            = document.getElementById('notesDiv');
+const assetDiv            = document.getElementById('assetDiv');
+const sellDateDiv         = document.getElementById('sellDateDiv');
 
+const soldDateinput       = document.getElementById('sold_at');
+const assetInput          = document.getElementById('asset_id')
 const nameInput           = document.getElementById('name');
 const referenceNumberInput= document.getElementById('reference_number');
 const assetCategoryInput  = document.getElementById('asset_category');
@@ -76,6 +80,8 @@ window.buyAssetForm = function buyAssetForm() {
     setVisibility(customerNameDiv,     customerInput,       'none', false);
     setVisibility(customerNumberDiv,   customerNumberInput, 'none', false);
     setVisibility(soldForDiv,          soldForInput,        'none', false);
+    setVisibility(assetDiv,            assetInput,          'none', false);
+    setVisibility(sellDateDiv,         soldDateinput,       'none', false);
 };
 
 window.sellAssetForm = function sellAssetForm() {
@@ -107,6 +113,8 @@ window.sellAssetForm = function sellAssetForm() {
     setVisibility(customerNameDiv,     customerInput,       'block', true);
     setVisibility(customerNumberDiv,   customerNumberInput, 'block', true);
     setVisibility(soldForDiv,          soldForInput,        'block', true);
+    setVisibility(assetDiv,            assetInput,          'block', true);
+    setVisibility(sellDateDiv,         soldDateinput,       'block', true);
 };
 
 window.document.addEventListener('DOMContentLoaded', function() {

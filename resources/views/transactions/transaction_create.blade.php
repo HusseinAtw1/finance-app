@@ -119,6 +119,17 @@
                                 </div>
 
                                 <div class="row">
+
+                                    <div class="col-md-3 mb-3" id="assetDiv">
+                                        <label for="asset_id" class="form-label">Select Asset:</label>
+                                        <select name="asset_id" id="asset_id" class="form-select" required>
+                                            <option value="">--Select Asset--</option>
+                                            @foreach($assets as $asset)
+                                                <option value="{{ $asset->id }}">{{ $asset->name.'-'.$asset->reference_number }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                     <div class="col-md-3 mb-3" id="accountDiv">
                                         <label for="account_id" class="form-label">Select Account:</label>
                                         <select name="account_id" id="account_id" class="form-select" required>
@@ -167,6 +178,15 @@
                                             <div class="text-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <div class="col-md-3 mb-3" id="sellDateDiv" style="display: none">
+                                        <label for="sold_at" class="form-label">Sell Date:</label>
+                                        <input type="datetime-local" name="sold_at" id="sold_at" value="{{ old('sold_at') }}" class="form-control" required>
+                                        @error('sold_at')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
                                 </div>
 
                                 <div class="row">
