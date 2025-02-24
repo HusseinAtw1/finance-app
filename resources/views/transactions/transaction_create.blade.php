@@ -161,7 +161,7 @@
                                     <div class="col-md-3 mb-3" id="transactionTypeDiv">
                                         <label for="transaction_type" class="form-label">Transaction Type:</label>
                                         <select name="transaction_type" id="transaction_type" class="form-select" onchange="handleTransactionType(this)" required disabled>
-                                            <option value="">--Select Transaction Type--</option>
+                                            <option value="" id="transaction_type_option"></option>
                                         </select>
                                         @error('transaction_type')
                                             <div class="text-danger">{{ $message }}</div>

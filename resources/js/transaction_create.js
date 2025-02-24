@@ -39,7 +39,7 @@ const notesInput          = document.getElementById('notes');
 
 const formField           = document.getElementById('assetForm');
 
-
+const transactionTypeOption = document.getElementById('transaction_type_option');
 
 // Function to update both visibility and required status
 function setVisibility(div, input, displayValue, isRequired) {
@@ -51,6 +51,8 @@ window.buyAssetForm = function buyAssetForm() {
     actionField.innerHTML = 'Buy';
     document.getElementById('methodInput').value = 'POST';
     formField.action = window.storeAssetUrl;
+    transactionTypeOption.value = 'debit'
+    transactionTypeOption.innerHTML = 'Debit'
     // Show buy-specific fields and mark them as required
     setVisibility(nameDiv,             nameInput,           'block', true);
     setVisibility(referenceNumberDiv,  referenceNumberInput,'block', true);
@@ -80,6 +82,8 @@ window.sellAssetForm = function sellAssetForm() {
     actionField.innerHTML = 'Sell';
     document.getElementById('methodInput').value = 'PATCH';
     formField.action = window.sellAssetUrl;
+    transactionTypeOption.value = 'credit'
+    transactionTypeOption.innerHTML = 'Credit'
     // Show common fields
     setVisibility(accountDiv,          accountInput,        'block', true);
     setVisibility(transactionTypeDiv,  transactionTypeInput,'block', true);
