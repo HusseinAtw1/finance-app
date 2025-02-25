@@ -45,8 +45,10 @@ class TransactionController extends Controller
         $accounts = Account::where('user_id', $user->id)->get();
         $assetCategories = AssetCategory::where('user_id', $user->id)->get();
         $assetTypes = AssetType::where('user_id', $user->id)->get();
-        $transactionDetails = TransactionDetail::where('transaction_id', $transaction->id)->get();
-        $assets = Asset::where('user_id', $user->id)->get();
+        $transactionDetails = TransactionDetail::with(['account', 'supplier', 'customer'])
+        ->where('transaction_id', $transaction->id)
+        ->get();
+            $assets = Asset::where('user_id', $user->id)->get();
         $currencies =  Currency::where('user_id', $user->id)->get();
         return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories'));
     }
@@ -64,8 +66,10 @@ class TransactionController extends Controller
         $accounts = Account::where('user_id', $user->id)->get();
         $assetCategories = AssetCategory::where('user_id', $user->id)->get();
         $assetTypes = AssetType::where('user_id', $user->id)->get();
-        $transactionDetails = TransactionDetail::where('transaction_id', $transaction->id)->get();
-        return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories'));
+        $transactionDetails = TransactionDetail::with(['account', 'supplier', 'customer'])
+        ->where('transaction_id', $transaction->id)
+        ->get();
+            return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories'));
     }
 
     public function buyAsset(Request $request, Transaction $transaction)

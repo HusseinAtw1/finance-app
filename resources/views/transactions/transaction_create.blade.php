@@ -22,9 +22,9 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>Type</th>
-                                        <th>Account ID</th>
-                                        <th>Supplier ID</th>
-                                        <th>Customer ID</th>
+                                        <th>Account</th>
+                                        <th>Supplier</th>
+                                        <th>Customer</th>
                                         <th>Type</th>
                                         <th>Current Price</th>
                                         <th>Purchase Price</th>
@@ -38,13 +38,13 @@
                                     @foreach($transactionDetails as $detail)
                                         <tr>
                                             <td>{{ class_basename($detail->transactionable_type) }}</td>
-                                            <td>{{ $detail->account_id }}</td>
-                                            <td>{{ $detail->supplier_id }}</td>
-                                            <td>{{ $detail->customer_id }}</td>
-                                            <td>{{ $detail->type }}</td>
+                                            <td>{{ $detail->account->name }}</td>
+                                            <td>{{ $detail->supplier->name ?? '-' }}</td>
+                                            <td>{{ $detail->customer->name ?? null }} - {{ $detail->customer->phone_number ?? null }}</td>
+                                            <td>{{ ucfirst($detail->type) }}</td>
                                             <td>{{ $detail->current_price }}</td>
                                             <td>{{ $detail->purchase_price }}</td>
-                                            <td>{{ $detail->sold_for }}</td>
+                                            <td>{{ $detail->sold_for ?? '-' }}</td>
                                             <td>{{ $detail->quantity }}</td>
                                             <td>{{ $detail->amount }}</td>
                                             <td>
@@ -56,6 +56,15 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <div class="container mt-3">
+                        <div class="d-flex justify-content-center gap-2 mb-4">
+                            <button class="btn btn-primary" onclick="showAssetForm()">Add Asset</button>
+                            <button class="btn btn-secondary" onclick="showLiabilityForm()">Add Liability</button>
+                            <button class="btn btn-info" onclick="showExpenseForm()">Add Expense</button>
+                            <button class="btn btn-outline-dark" onclick="hideAllForms()">Hide Forms</button>
                         </div>
                     </div>
 
@@ -282,7 +291,7 @@
 
                                 <div class="row">
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-primary">Add to Transaction</button>
+                                        <button type="submit" class="btn btn-primary">Add Asset to Transaction</button>
                                     </div>
                                 </div>
 

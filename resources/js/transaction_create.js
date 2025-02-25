@@ -1,3 +1,6 @@
+import axios from 'axios';
+
+// Modify your existing transaction_create.js file to include Axios functionality
 const actionField         = document.getElementById('action');
 const nameDiv             = document.getElementById('nameDiv');
 const referenceNumberDiv  = document.getElementById('referenceNumberDiv');
@@ -117,6 +120,163 @@ window.sellAssetForm = function sellAssetForm() {
     setVisibility(sellDateDiv,         soldDateinput,       'block', true);
 };
 
+// Function to display validation errors
+function displayErrors(errors) {
+    // Clear any existing error messages first
+    document.querySelectorAll('.text-danger').forEach(element => {
+        if (!element.classList.contains('d-none')) {
+            element.innerHTML = '';
+        }
+    });
+
+    // Display new error messages
+    for (const field in errors) {
+        const errorDiv = document.querySelector(`[name="${field}"]`).nextElementSibling;
+        if (errorDiv && errorDiv.classList.contains('text-danger')) {
+            errorDiv.innerHTML = errors[field][0]; // Display the first error message
+        } else {
+            // Create error element if it doesn't exist
+            const input = document.querySelector(`[name="${field}"]`);
+            if (input) {
+                const div = document.createElement('div');
+                div.className = 'text-danger';
+                div.innerHTML = errors[field][0];
+                input.parentNode.appendChild(div);
+            }
+        }
+    }
+}
+
+function refreshTransactionDetails() {
+    axios.get(window.location.href)
+        .then(response => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(response.data, 'text/html');
+            const newTable = doc.querySelector('.table-responsive');
+            const currentTable = document.querySelector('.table-responsive');
+
+            if (newTable && currentTable) {
+                currentTable.innerHTML = newTable.innerHTML;
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing table:', error);
+        });
+}
+
+function submitBuyAssetForm(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Add CSRF token
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Submit using Axios
+    axios.post(window.storeAssetUrl, formData, {
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    .then(response => {
+        showNotification('Asset successfully added to transaction!');
+        refreshTransactionDetails();
+        form.reset();
+        buyAssetForm(); // Reset form to buy state
+    })
+    .catch(error => {
+        if (error.response && error.response.status === 422) {
+            // Validation errors
+            displayErrors(error.response.data.errors);
+            showNotification('Please fix the errors in the form.', 'danger');
+        } else {
+            // Server error or other issues
+            showNotification('An error occurred while processing your request.', 'danger');
+            console.error('Error:', error);
+        }
+    });
+}
+
+function submitSellAssetForm(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Add CSRF token and method override for Laravel
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Submit using Axios
+    axios.post(window.sellAssetUrl, formData, {
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Content-Type': 'multipart/form-data',
+            'X-HTTP-Method-Override': 'PATCH'
+        }
+    })
+    .then(response => {
+        showNotification('Asset successfully sold!');
+        refreshTransactionDetails();
+        form.reset();
+        sellAssetForm(); // Reset form to sell state
+    })
+    .catch(error => {
+        if (error.response && error.response.status === 422) {
+            // Validation errors
+            displayErrors(error.response.data.errors);
+            showNotification('Please fix the errors in the form.', 'danger');
+        } else {
+            // Server error or other issues
+            showNotification('An error occurred while processing your request.', 'danger');
+            console.error('Error:', error);
+        }
+    });
+}
+
+window.document.addEventListener('DOMContentLoaded', function() {
+    buyAssetForm(); // Set default form state
+
+    // Attach form submit handler
+    formField.addEventListener('submit', function(e) {
+        // Determine which form type is active
+        if (actionField.innerHTML === 'Buy') {
+            submitBuyAssetForm(e);
+        } else if (actionField.innerHTML === 'Sell') {
+            submitSellAssetForm(e);
+        }
+    });
+});
+
+
+const assetTemplate = document.getElementById('assetTemplate');
+assetTemplate.style.display = 'none';
+
+window.showAssetForm = function() {
+    assetTemplate.style.display = 'block';
+}
+
+window.showLiabilityForm = function() {
+    assetTemplate.style.display = 'none';
+}
+
+window.showExpenseForm = function() {
+    assetTemplate.style.display = 'none';
+}
+
+window.hideAllForms = function() {
+    assetTemplate.style.display = 'none';
+}
+
 window.document.addEventListener('DOMContentLoaded', function() {
     buyAssetForm();
+    assetTemplate.style.display = 'none';
+    formField.addEventListener('submit', function(e) {
+        if (actionField.innerHTML === 'Buy') {
+            submitBuyAssetForm(e);
+        } else if (actionField.innerHTML === 'Sell') {
+            submitSellAssetForm(e);
+        }
+    });
 });
