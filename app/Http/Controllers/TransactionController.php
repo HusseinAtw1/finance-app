@@ -26,33 +26,6 @@ class TransactionController extends Controller
         return view('transactions.transactions', compact('transactions'));
     }
 
-    public function createNewTransaction()
-    {
-        $user = Auth::user();
-        $transaction = Transaction::create([
-            'user_id'    => $user->id,
-            'status'     => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        $currencies =  Currency::where('user_id', $user->id)->get();
-        $depreciations = AssetDepreciation::all();
-        $soldStatus = AssetStatus::where('name', 'Sold')->first();
-        $assets = Asset::where('user_id', $user->id)
-            ->where('asset_status_id', '!=', $soldStatus->id)
-            ->get();
-        $suppliers = Supplier::where('user_id', $user->id)->get();
-        $accounts = Account::where('user_id', $user->id)->get();
-        $assetCategories = AssetCategory::where('user_id', $user->id)->get();
-        $assetTypes = AssetType::where('user_id', $user->id)->get();
-        $transactionDetails = TransactionDetail::with(['account', 'supplier', 'customer'])
-        ->where('transaction_id', $transaction->id)
-        ->get();
-            $assets = Asset::where('user_id', $user->id)->get();
-        $currencies =  Currency::where('user_id', $user->id)->get();
-        return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories'));
-    }
-
     public function show(Transaction $transaction)
     {
         $user = Auth::user();
@@ -70,6 +43,18 @@ class TransactionController extends Controller
         ->where('transaction_id', $transaction->id)
         ->get();
             return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories'));
+    }
+
+    public function createNewTransaction()
+    {
+        $user = Auth::user();
+        $transaction = Transaction::create([
+            'user_id'    => $user->id,
+            'status'     => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return $this->show($transaction);
     }
 
     public function buyAsset(Request $request, Transaction $transaction)
@@ -101,7 +86,7 @@ class TransactionController extends Controller
             'location'          => 'required|string|max:255',
             'supplier_id'       => 'required|exists:suppliers,id',
             'notes'             => 'nullable|string',
-            'account_id'        => 'required|exists:accounts,id',
+            'account_id'        => ['required', Rule::exists('accounts', 'id')->where('user_id', $user->id),],
             'quantity'          => 'required|integer|min:1',
         ]);
 

@@ -120,7 +120,6 @@ window.sellAssetForm = function sellAssetForm() {
     setVisibility(sellDateDiv,         soldDateinput,       'block', true);
 };
 
-// Function to display validation errors
 function displayErrors(errors) {
     // Clear any existing error messages first
     document.querySelectorAll('.text-danger').forEach(element => {
@@ -145,6 +144,28 @@ function displayErrors(errors) {
             }
         }
     }
+}
+
+// Function to show success message
+function showNotification(message, type = 'success') {
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Insert at the top of the container
+    const container = document.querySelector('.container.mt-5');
+    container.insertBefore(alertDiv, container.firstChild);
+
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+        setTimeout(() => alertDiv.remove(), 150);
+    }, 5000);
 }
 
 function refreshTransactionDetails() {
@@ -269,14 +290,4 @@ window.hideAllForms = function() {
     assetTemplate.style.display = 'none';
 }
 
-window.document.addEventListener('DOMContentLoaded', function() {
-    buyAssetForm();
-    assetTemplate.style.display = 'none';
-    formField.addEventListener('submit', function(e) {
-        if (actionField.innerHTML === 'Buy') {
-            submitBuyAssetForm(e);
-        } else if (actionField.innerHTML === 'Sell') {
-            submitSellAssetForm(e);
-        }
-    });
-});
+

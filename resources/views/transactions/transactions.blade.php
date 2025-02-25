@@ -15,6 +15,7 @@
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Status</th>
                     <th>Total</th>
                     <th>Transaction Date</th>
@@ -29,9 +30,10 @@
                 @else
                     @foreach($transactions as $transaction)
                         <tr>
+                            <td>{{ $transaction->id }}</td>
                             <td>{{ $transaction->status }}</td>
                             <td>{{ $transaction->total }}</td>
-                            <td>{{ $transaction->transaction_date }}</td>
+                            <td>{{ $transaction->created_at }}</td>
                             <td>
                                 <a href="{{ route('transaction_create.show', $transaction->id) }}" class="btn btn-info">
                                     View

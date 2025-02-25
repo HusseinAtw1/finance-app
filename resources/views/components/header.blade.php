@@ -25,41 +25,18 @@
 					<a
 						class="nav-link dropdown-toggle"
 						href="#"
-						id="financialDropdown"
+						id="assetDropdown"
 						role="button"
 						data-bs-toggle="dropdown"
 						aria-expanded="false"
 					>
-						Financial Categories
+                        Assets
 					</a>
-					<ul class="dropdown-menu" aria-labelledby="financialDropdown">
+					<ul class="dropdown-menu" aria-labelledby="assetDropdown">
 						<li>
 							<a class="dropdown-item" href="/assets">Assets</a>
 						</li>
-						<li>
-							<a class="dropdown-item" href="{{ route('liabilities.index') }}">Liability</a>
-						</li>
-						<li>
-							<a class="dropdown-item" href="{{ route('equities.index') }}">Equity</a>
-						</li>
-						<li>
-							<a class="dropdown-item" href="{{ route('expenses.index') }}">Expense</a>
-						</li>
-					</ul>
-				</li>
-				<li class="nav-item dropdown">
-					<a
-						class="nav-link dropdown-toggle"
-						href="#"
-						id="addonsDropdown"
-						role="button"
-						data-bs-toggle="dropdown"
-						aria-expanded="false"
-					>
-						Add-Ons
-					</a>
-					<ul class="dropdown-menu" aria-labelledby="addonsDropdown">
-						<li>
+                        <li>
 							<a class="dropdown-item" href="{{ route('asset_types.show') }}">Assets Types</a>
 						</li>
                         <li>
@@ -68,11 +45,14 @@
                         <li>
 							<a class="dropdown-item" href="{{ route('asset_statuses.show') }}">Asset Status</a>
 						</li>
-						<li>
-							<a class="dropdown-item" href="{{ route('currencies.currencies') }}">Currencies</a>
-						</li>
+
 					</ul>
 				</li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('currencies.currencies') }}">Currencies</a>
+                </li>
+
 			</ul>
 
 			<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
