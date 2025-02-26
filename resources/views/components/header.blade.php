@@ -20,7 +20,7 @@
 				<li class="nav-item">
 					<a class="nav-link" href="/transactions">Transactions</a>
 				</li>
-				<!-- Dropdown for Financial Categories -->
+
 				<li class="nav-item dropdown">
 					<a
 						class="nav-link dropdown-toggle"
@@ -51,6 +51,10 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('currencies.currencies') }}">Currencies</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('suppliers.index') }}">Supplier</a>
                 </li>
 
 			</ul>

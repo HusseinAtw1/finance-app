@@ -1,19 +1,20 @@
 <?php
 
+use App\Models\Supplier;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AssetCategoryController;
-use App\Http\Controllers\AssetStatusController;
-use App\Http\Controllers\AssetTypeController;
-use App\Http\Controllers\currencyController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\currencyController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\LiabilityController;
+use App\Http\Controllers\AssetStatusController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\AssetCategoryController;
 use App\Http\Controllers\RegisteredUserController;
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -39,7 +40,9 @@ Route::get('/transactions/{transaction}', [TransactionController::class, 'show']
 Route::POST('/transaction/{transaction}', [TransactionController::class, 'buyAsset'])->middleware('auth')->name("transaction_asset.store");
 Route::PATCH('/transaction/{transaction}', [TransactionController::class, 'sellAsset'])->middleware('auth')->name("transaction_asset.sell");
 
-
+Route::middleware(['auth'])->group(function () {
+    Route::resource('suppliers', SupplierController::class);
+});
 
 Route::get('/asset_type', [AssetTypeController::class, 'show'])->name('asset_types.show')->middleware('auth');
 Route::POST('/asset_type/store', [AssetTypeController::class, 'store'])->name('asset_types.store')->middleware('auth');

@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('suppliers', function (Blueprint $table){
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->string('name')->unique();
+            $table->string('name');
+            $table->string('phone_number');
+            $table->unique(['name', 'user_id']);
             $table->timestampsTz();
         });
 
