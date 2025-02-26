@@ -8,6 +8,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\currencyController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\LiabilityController;
@@ -42,6 +43,7 @@ Route::PATCH('/transaction/{transaction}', [TransactionController::class, 'sellA
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('suppliers', SupplierController::class);
+    Route::resource('customers', CustomerController::class);
 });
 
 Route::get('/asset_type', [AssetTypeController::class, 'show'])->name('asset_types.show')->middleware('auth');
