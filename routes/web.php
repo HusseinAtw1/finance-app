@@ -40,6 +40,7 @@ Route::POST('/transactions/create', [TransactionController::class, 'createNewTra
 Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->middleware('auth')->name('transaction_create.show');
 Route::POST('/transaction/{transaction}', [TransactionController::class, 'buyAsset'])->middleware('auth')->name("transaction_asset.store");
 Route::PATCH('/transaction/{transaction}', [TransactionController::class, 'sellAsset'])->middleware('auth')->name("transaction_asset.sell");
+Route::delete('/transaction-details/{id}', [TransactionController::class, 'destroy'])->name('transaction_detail.destroy');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('suppliers', SupplierController::class);

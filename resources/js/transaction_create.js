@@ -14,7 +14,7 @@ const quantityDiv         = document.getElementById('quantityDiv');
 const currentValueDiv     = document.getElementById('currentValueDiv');
 const purchasePriceDiv    = document.getElementById('purchasePriceDiv');
 const purchaseDateDiv     = document.getElementById('purchaseDateDiv');
-const locationDiv         = document.getElementById("locationDiv");
+const storageDiv          = document.getElementById("storageDiv");
 const supplierDiv         = document.getElementById('supplierDiv');
 const customerNameDiv     = document.getElementById('customerNameDiv');
 const customerNumberDiv   = document.getElementById('customerNumberDiv');
@@ -37,7 +37,7 @@ const quantityInput       = document.getElementById('quantity');
 const currentValueInput   = document.getElementById('current_value');
 const purchasePriceInput  = document.getElementById('purchase_price');
 const purchaseDateInput   = document.getElementById('purchase_date');
-const locationInput       = document.getElementById('location');
+const storage_id          = document.getElementById('storage_id');
 const supplierInput       = document.getElementById('supplier_id');
 const customerInput       = document.getElementById('customer');
 const customerNumberInput = document.getElementById('customer_number');
@@ -70,7 +70,7 @@ window.buyAssetForm = function buyAssetForm() {
     setVisibility(currentValueDiv,     currentValueInput,   'block', true);
     setVisibility(purchasePriceDiv,    purchasePriceInput,  'block', true);
     setVisibility(purchaseDateDiv,     purchaseDateInput,   'block', true);
-    setVisibility(locationDiv,         locationInput,       'block', true);
+    setVisibility(storageDiv,          storage_id,          'block', true);
     setVisibility(supplierDiv,         supplierInput,       'block', true);
     setVisibility(notesDiv,            notesInput,          'block', true);
 
@@ -108,7 +108,7 @@ window.sellAssetForm = function sellAssetForm() {
     setVisibility(currentValueDiv,     currentValueInput,   'none', false);
     setVisibility(purchasePriceDiv,    purchasePriceInput,  'none', false);
     setVisibility(purchaseDateDiv,     purchaseDateInput,   'none', false);
-    setVisibility(locationDiv,         locationInput,       'none', false);
+    setVisibility(storageDiv,          storage_id,          'none', false);
     setVisibility(supplierDiv,         supplierInput,       'none', false);
     setVisibility(notesDiv,            notesInput,          'none', false);
 
@@ -289,5 +289,38 @@ window.showExpenseForm = function() {
 window.hideAllForms = function() {
     assetTemplate.style.display = 'none';
 }
+
+window.deleteTransactionDetail = function(id) {
+    // Ask for confirmation before deleting
+    if (!confirm("Are you sure you want to delete this transaction detail?")) {
+        return;
+    }
+
+    // Retrieve CSRF token from the meta tag
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Construct the URL by appending the id to the base URL
+    const url = window.deleteTransactionDetailUrl + '/' + id;
+
+    axios.delete(url, {
+        headers: {
+            'X-CSRF-TOKEN': token
+        }
+    })
+    .then(response => {
+        if (response.data.success) {
+            showNotification(response.data.message);
+            refreshTransactionDetails();
+        } else {
+            showNotification('Failed to delete transaction detail.', 'danger');
+        }
+    })
+    .catch(error => {
+        showNotification('An error occurred while deleting the transaction detail.', 'danger');
+        console.error('Delete error:', error);
+    });
+};
+
+
 
 

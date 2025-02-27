@@ -27,7 +27,7 @@ class SupplierController extends Controller
                     return $query->where('user_id', Auth::id());
                 })
             ],
-            'phone_number' => ['required', 'integer', 'max:20'],
+            'phone_number' => ['required', 'integer'],
         ]);
 
         try {
@@ -57,7 +57,7 @@ class SupplierController extends Controller
                                 ->where('id', '!=', $id);
                 })
             ],
-            'phone_number' => ['required', 'integer', 'max:20'],
+            'phone_number' => ['required', 'integer'],
         ]);
 
         $existingSupplier = Supplier::where('user_id', Auth::id())

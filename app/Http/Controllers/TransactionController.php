@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\Account;
+use App\Models\Storage;
 use App\Models\Currency;
 use App\Models\Customer;
 use App\Models\Supplier;
@@ -15,6 +16,7 @@ use App\Models\AssetCategory;
 use Illuminate\Validation\Rule;
 use App\Models\AssetDepreciation;
 use App\Models\TransactionDetail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
@@ -32,17 +34,18 @@ class TransactionController extends Controller
         $currencies =  Currency::where('user_id', $user->id)->get();
         $depreciations = AssetDepreciation::all();
         $soldStatus = AssetStatus::where('name', 'Sold')->first();
+        $pendingStatus = AssetStatus::where('name', 'Pending')->first();
         $assets = Asset::where('user_id', $user->id)
             ->where('asset_status_id', '!=', $soldStatus->id)
+            ->where('asset_status_id', '!=', $pendingStatus->id)
             ->get();
         $suppliers = Supplier::where('user_id', $user->id)->get();
         $accounts = Account::where('user_id', $user->id)->get();
         $assetCategories = AssetCategory::where('user_id', $user->id)->get();
         $assetTypes = AssetType::where('user_id', $user->id)->get();
-        $transactionDetails = TransactionDetail::with(['account', 'supplier', 'customer'])
-        ->where('transaction_id', $transaction->id)
-        ->get();
-            return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories'));
+        $transactionDetails = TransactionDetail::with(['account', 'supplier', 'customer'])->where('transaction_id', $transaction->id)->get();
+        $storages = Storage::where('user_id', $user->id)->get();
+            return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories', 'storages'));
     }
 
     public function createNewTransaction()
@@ -83,7 +86,7 @@ class TransactionController extends Controller
             'current_value'     => 'required|numeric|min:0',
             'purchase_price'    => 'required|numeric|min:0',
             'purchase_date'     => 'required|date',
-            'location'          => 'required|string|max:255',
+            'storage_id'        => ['required', 'integer', Rule::exists('storages', 'id')->where('user_id', $user->id),],
             'supplier_id'       => 'required|exists:suppliers,id',
             'notes'             => 'nullable|string',
             'account_id'        => ['required', Rule::exists('accounts', 'id')->where('user_id', $user->id),],
@@ -105,7 +108,7 @@ class TransactionController extends Controller
             'quantity'              => $validated['quantity'],
             'current_value'         => $validated['current_value'],
             'purchase_price'        => $validated['purchase_price'],
-            'location'              => $validated['location'] ?? null,
+            'storage_id'            => $validated['storage_id'] ?? null,
             'notes'                 => $validated['notes'] ?? null,
             'purchase_at'           => $validated['purchase_date'],
             'created_at'            => now(),
@@ -188,6 +191,37 @@ class TransactionController extends Controller
         ]);
 
         return back();
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $transactionDetail = TransactionDetail::findOrFail($id);
+
+            $user = Auth::user();
+
+            if($transactionDetail->transaction->user_id !== $user->id)
+            {
+                abort(403, 'NOT AUTHORIZED!');
+            }
+
+            $transactionDetail->forceDelete();
+            if ($transactionDetail->transactionable_type === Asset::class && $transactionDetail->type === 'debit') {
+                $asset = Asset::findOrFail($transactionDetail->transactionable_id);
+                $asset->forceDelete();
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction detail deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete transaction detail: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete transaction detail: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 

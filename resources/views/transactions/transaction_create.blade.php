@@ -48,7 +48,7 @@
                                             <td>{{ $detail->quantity }}</td>
                                             <td>{{ $detail->amount }}</td>
                                             <td>
-                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteTransactionDetail({{ $detail->id }})">
                                                     Delete
                                                 </button>
                                             </td>
@@ -255,10 +255,15 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-3 mb-3" id="locationDiv">
-                                        <label for="location" class="form-label">Location:</label>
-                                        <input type="text" name="location" id="location" value="{{ old('location') }}" class="form-control" required>
-                                        @error('location')
+                                    <div class="col-md-3 mb-3" id="storageDiv">
+                                        <label for="storage_id" class="form-label">Storage:</label>
+                                        <select name="storage_id" id="storage_id" class="form-select">
+                                            <option value="">--Select Storage--</option>
+                                            @foreach ($storages as $storage)
+                                                <option value="{{$storage->id}}" {{old('storage_id')}}>{{$storage->name}}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('storage_id')
                                             <div class="text-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -301,12 +306,12 @@
                 </div>
             </div>
         </div>
-
     @vite('resources/js/transaction_create.js')
 
     <script>
         window.storeAssetUrl = "{{ route('transaction_asset.store', $transaction->id) }}";
         window.sellAssetUrl = "{{ route('transaction_asset.sell', $transaction->id) }}";
+        window.deleteTransactionDetailUrl = "{{ url('/transaction-details') }}";
     </script>
 
     @endsection

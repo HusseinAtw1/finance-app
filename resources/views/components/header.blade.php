@@ -42,9 +42,9 @@
                         <li>
 							<a class="dropdown-item" href="{{ route('asset_categories.show') }}">Assets Categories</a>
 						</li>
-                        <li>
+                        {{-- <li>
 							<a class="dropdown-item" href="{{ route('asset_statuses.show') }}">Asset Status</a>
-						</li>
+						</li> --}}
 
 
 					</ul>

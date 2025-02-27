@@ -30,7 +30,7 @@ class StorageController extends Controller
         $storage->description = $request->description;
         $storage->save();
 
-        return back()->route('storages.storages')->with('success', 'Storage created successfully.');
+        return redirect()->back()->route('storages.storages')->with('success', 'Storage created successfully.');
     }
 
     public function update(Request $request, Storage $storage)
@@ -48,7 +48,7 @@ class StorageController extends Controller
         $storage->description = $request->description;
         $storage->save();
 
-        return back()->with('success', 'Storage updated successfully.');
+        return redirect()->back()->with('success', 'Storage updated successfully.');
     }
 
     public function destroy(Storage $storage)
@@ -57,6 +57,6 @@ class StorageController extends Controller
 
         $storage->delete();
 
-        return back()->with('success', 'Storage deleted successfully.');
+        return redirect()->back()->with('success', 'Storage deleted successfully.');
     }
 }
