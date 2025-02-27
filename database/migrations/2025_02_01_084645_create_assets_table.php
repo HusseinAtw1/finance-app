@@ -53,6 +53,17 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
+        Schema::create('storages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('name');
+            $table->string('address')->nullable(); // Optional detailed address
+            $table->text('description')->nullable(); // Optional extra details
+            $table->timestampsTz();
+            $table->softDeletesTz();
+            $table->unique(['user_id', 'name']);
+        });
+
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->string('reference_number');
@@ -63,11 +74,11 @@ return new class extends Migration
             $table->foreignId('asset_category_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_status_id')->constrained('asset_statuses')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('asset_depreciation_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('storage_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
             $table->integer('quantity')->unsigned()->nullable();
             $table->decimal('current_value', 15, 6)->nullable()->unsigned();
             $table->decimal('purchase_price', 15, 6)->unsigned()->nullable();
-            $table->string('location')->nullable();
             $table->text('notes')->nullable();
             $table->timestampTz('purchase_at')->nullable();
             $table->timestampsTz();
@@ -95,6 +106,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('asset_value_history');
         Schema::dropIfExists('assets');
+        Schema::dropIfExists('storages');
+        Schema::dropIfExists('asset_depreciations');
         Schema::dropIfExists('asset_statuses');
         Schema::dropIfExists('asset_categories');
         Schema::dropIfExists('asset_types');

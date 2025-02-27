@@ -94,4 +94,9 @@ class User extends Authenticatable
         return $this->hasMany(Customer::class);
     }
 
+    public function storages()
+    {
+        return $this->hasMany(Storage::class);
+    }
+
 }

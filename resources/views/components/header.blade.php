@@ -46,6 +46,7 @@
 							<a class="dropdown-item" href="{{ route('asset_statuses.show') }}">Asset Status</a>
 						</li>
 
+
 					</ul>
 				</li>
 
@@ -59,6 +60,10 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('customers.index') }}">Customers</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('storages.index') }}">Storages</a>
                 </li>
 
 			</ul>
