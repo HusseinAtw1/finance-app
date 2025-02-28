@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Modify your existing transaction_create.js file to include Axios functionality
 const actionField         = document.getElementById('action');
 const nameDiv             = document.getElementById('nameDiv');
 const referenceNumberDiv  = document.getElementById('referenceNumberDiv');

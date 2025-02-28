@@ -78,7 +78,7 @@
                         </div>
 
                         <div class="card-body">
-                            <form method="POST" action="{{ route('transaction_asset.store', ['transaction' => $transaction->id]) }}" id="assetForm">
+                            <form method="POST" action="{{ route('transactionDetail_asset.store', ['transaction' => $transaction->id]) }}" id="assetForm">
                                 @csrf
                                 <input type="hidden" name="_method" value="POST" id="methodInput">
                                 {{-- New Asset Details Fields --}}
@@ -309,8 +309,8 @@
     @vite('resources/js/transaction_create.js')
 
     <script>
-        window.storeAssetUrl = "{{ route('transaction_asset.store', $transaction->id) }}";
-        window.sellAssetUrl = "{{ route('transaction_asset.sell', $transaction->id) }}";
+        window.storeAssetUrl = "{{ route('transactionDetail_asset.store', $transaction->id) }}";
+        window.sellAssetUrl = "{{ route('transactionDetail_asset.sell', $transaction->id) }}";
         window.deleteTransactionDetailUrl = "{{ url('/transaction-details') }}";
     </script>
 

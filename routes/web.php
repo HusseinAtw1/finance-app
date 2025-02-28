@@ -16,6 +16,7 @@ use App\Http\Controllers\AssetStatusController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AssetCategoryController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\TransactionDetailController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,9 +39,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/transactions', [TransactionController::class, 'index'])->middleware('auth')->name('transactions.show');
 Route::POST('/transactions/create', [TransactionController::class, 'createNewTransaction'])->middleware('auth')->name('create_transaction.create');
 Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->middleware('auth')->name('transaction_create.show');
-Route::POST('/transaction/{transaction}', [TransactionController::class, 'buyAsset'])->middleware('auth')->name("transaction_asset.store");
-Route::PATCH('/transaction/{transaction}', [TransactionController::class, 'sellAsset'])->middleware('auth')->name("transaction_asset.sell");
-Route::delete('/transaction-details/{id}', [TransactionController::class, 'destroy'])->name('transaction_detail.destroy');
+
+Route::POST('/transaction/{transaction}', [TransactionDetailController::class, 'buyAsset'])->middleware('auth')->name("transactionDetail_asset.store");
+Route::PATCH('/transaction/{transaction}', [TransactionDetailController::class, 'sellAsset'])->middleware('auth')->name("transactionDetail_asset.sell");
+Route::delete('/transaction-details/{id}', [TransactionDetailController::class, 'destroy'])->name('transaction_detail.destroy');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('suppliers', SupplierController::class);
