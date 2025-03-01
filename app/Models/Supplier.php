@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
 {
-    protected $fillable = ['user_id', 'name', 'phone_number'];
+    use SoftDeletes;
+
+    protected $fillable = ['user_id', 'name', 'phone_number', 'email'];
 
     public function user()
     {

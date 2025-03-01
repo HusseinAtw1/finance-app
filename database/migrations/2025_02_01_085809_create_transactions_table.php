@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
+            $table->string('email');
             $table->string('phone_number');
-            $table->unique(['name', 'user_id']);
             $table->timestampsTz();
+            $table->softDeletes();
+            $table->unique(['name', 'user_id', 'email', 'phone_number']);
         });
 
         Schema::create('customers', function (Blueprint $table){

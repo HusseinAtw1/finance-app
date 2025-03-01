@@ -21,4 +21,9 @@ class Storage extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
 }

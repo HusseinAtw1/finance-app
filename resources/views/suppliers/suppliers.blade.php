@@ -29,6 +29,14 @@
                 </div>
 
                 <div class="form-floating mb-3">
+                    <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email Address" value="{{ old('email', $supplier->email ?? '') }}">
+                    <label for="email">Email Address</label>
+                    @error('email')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-floating mb-3">
                     <input type="text" name="phone_number" id="phone_number" class="form-control @error('phone_number') is-invalid @enderror" placeholder="Phone Number" value="{{ old('phone_number') }}">
                     <label for="phone_number">Phone Number</label>
                     @error('phone_number')
@@ -51,6 +59,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Email</th>
                             <th>Phone Number</th>
                             <th>Action</th>
                         </tr>
@@ -59,8 +68,10 @@
                         @foreach($suppliers as $supplier)
                             <tr data-id="{{ $supplier->id }}"
                                 data-name="{{ $supplier->name }}"
+                                data-email="{{ $supplier->email }}"
                                 data-phone-number="{{ $supplier->phone_number }}">
                                 <td>{{ $supplier->name }}</td>
+                                <td>{{ $supplier->email }}</td>
                                 <td>{{ $supplier->phone_number }}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm edit-btn">Edit</button>
@@ -85,16 +96,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submitButton');
     const cancelButton = document.getElementById('cancelButton');
 
-    // Check if we're coming back from a validation error in edit mode
     const currentUrl = window.location.href;
     const isEditMode = currentUrl.includes('/suppliers/') && currentUrl.includes('/edit');
 
     if (isEditMode) {
-        // Extract supplier ID from URL (if editing)
         const urlParts = currentUrl.split('/');
         const supplierId = urlParts[urlParts.indexOf('suppliers') + 1];
 
-        // Set up form for edit mode
         form.action = `/suppliers/${supplierId}`;
         const methodInput = document.createElement('input');
         methodInput.type = 'hidden';
@@ -113,6 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             document.getElementById('name').value = row.dataset.name;
             document.getElementById('phone_number').value = row.dataset.phoneNumber;
+            document.getElementById('email').value = row.dataset.email;
 
             form.action = `/suppliers/${row.dataset.id}`;
             const methodInput = document.createElement('input');

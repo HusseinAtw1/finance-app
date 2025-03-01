@@ -66,11 +66,7 @@ Route::put('/asset_categories/{assetCategory}', [AssetCategoryController::class,
 Route::delete('/asset_categories/{assetCategory}', [AssetCategoryController::class, 'destroy'])->name('asset_categories.destroy')->middleware('auth');
 
 Route::get('/assets', [AssetController::class, 'show'])->name('assets.show')->middleware('auth');
-Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create')->middleware('auth');
-Route::post('/assets', [AssetController::class, 'store'])->name('assets.store')->middleware('auth');
 Route::get('/assets/{id}', [AssetController::class, 'detail'])->name('assets_detials.show')->middleware('auth');
-Route::post('/assets/sell/{id}', [AssetController::class, 'sell'])->name('assets.sell')->middleware('auth');
-Route::get('/asset/update/{assetType}', [AssetTypeController::class, 'showUpdate'])->name('asset_update.show')->middleware('auth');
 
 Route::get('/liabilities', [LiabilityController::class, 'index'])->name('liabilities.index')->middleware('auth');
 Route::get('/liabilities/create', [LiabilityController::class, 'create'])->name('liabilities.create')->middleware('auth');

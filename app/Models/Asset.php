@@ -56,4 +56,9 @@ class Asset extends Model
     {
         return $this->belongsTo(AssetDepreciation::class);
     }
+
+    public function storage()
+    {
+        return $this->belongsTo(Storage::class);
+    }
 }

@@ -3,105 +3,195 @@
 @section('content')
 
 <div class="container my-5">
-    <x-asset-details :asset="$asset"/>
-    @if ($asset->assetStatus->name !== 'Sold')
-        <div class="card shadow-lg">
-            <div class="card-header bg-primary py-3">
-                <h2 class="h4 mb-0" style="color: white"><i class="fas fa-hand-holding-usd me-2"></i>Sell Asset</h2>
-            </div>
-            <div class="card-body">
-                @if ($errors->any())
-                    <div class="alert alert-danger mb-4">
-                        <h5 class="alert-heading">Please fix the following errors:</h5>
-                        <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                <form action="{{ route('assets.sell', $asset->id) }}" method="POST" class="needs-validation" novalidate>
-                    @csrf
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label for="sell_price" class="form-label">Selling Price <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text" id="currencySymbol">{{ optional($asset->currency)->symbol ?? '$' }}</span>
-                                <input type="number" step="0.01" id="sell_price" name="sell_price" class="form-control @error('sell_price') is-invalid @enderror" placeholder="Enter selling price" value="{{ old('sell_price') }}" required>
-                                @error('sell_price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+    <style>
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+        }
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+            background-color: #4a6cf7 !important;
+        }
+        dt {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        dd {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .value-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .info-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: 100%;
+        }
+    </style>
 
-                        <div class="col-md-6">
-                            <label for="sold_at" class="form-label">Sale Date <span class="text-danger">*</span></label>
-                            <input type="datetime-local" id="sold_at" name="sold_at"class="form-control @error('sold_at') is-invalid @enderror" value="{{ old('sold_at') }}" required>
-                            @error('sold_at')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="currency" class="form-label">Currency <span class="text-danger">*</span></label>
-                            <select name="currency" id="currency" class="form-select">
-                                <option value="" data-symbol="$" selected>Choose a Currency</option>
-                                @foreach ($currencies as $currency)
-                                    <option value="{{ $currency->id }}" data-symbol="{{ $currency->symbol }}">
-                                        {{ $currency->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('currency')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-
-                        <div class="col-md-6">
-                            <label for="quantity" class="form-label">Quantity Sold <span class="text-danger">*</span></label>
-                            <input type="number" id="quantity" name="quantity"
-                                class="form-control @error('quantity') is-invalid @enderror"
-                                value="{{ old('quantity') }}" required>
-                            @error('quantity')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <input type="hidden" name="account_id" value="{{ $asset->account_id }}">
-
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-2"></i>Back
-                                </a>
-                                <button type="submit" class="btn btn-danger px-4">
-                                    <i class="fas fa-check-circle me-2"></i>Confirm Sale
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
+    <div class="card mb-5">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0 text-white">
+                    <i class="fas fa-cube me-2"></i>{{ $asset->name }}
+                </h2>
+                <div>
+                    <span class="badge bg-light text-dark me-2 fs-6 py-2 px-3">Reference Number: {{ $asset->reference_number }}</span>
+                    @if (in_array($asset->assetStatus->name, ['Active', 'Pending']))
+                        <span class="badge bg-success fs-6 py-2 px-3">{{ $asset->assetStatus->name }}</span>
+                    @elseif (in_array($asset->assetStatus->name, ['Inactive', 'Archived', 'Suspended']))
+                        <span class="badge bg-warning text-dark fs-6 py-2 px-3">{{ $asset->assetStatus->name }}</span>
+                    @else
+                        <span class="badge bg-danger fs-6 py-2 px-3">{{ $asset->assetStatus->name }}</span>
+                    @endif
+                </div>
             </div>
         </div>
-    @endif
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Asset Information
+                                </h5>
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-5">Type</dt>
+                                    <dd class="col-sm-7">{{ $asset->assetType->name }}</dd>
+
+                                    <dt class="col-sm-5">Category</dt>
+                                    <dd class="col-sm-7">{{ $asset->assetCategory->name }}</dd>
+
+                                    <dt class="col-sm-5">Storage Location</dt>
+                                    <dd class="col-sm-7">{{ $asset->storage->name }}</dd>
+
+                                    <dt class="col-sm-5">Quantity</dt>
+                                    <dd class="col-sm-7">{{ $asset->quantity ?? 'N/A' }}</dd>
+
+                                    <dt class="col-sm-5">Depreciation Method</dt>
+                                    <dd class="col-sm-7">{{ $asset->assetDepreciation->method }}</dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-chart-line me-2"></i>Financial Details
+                                </h5>
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-5">Currency</dt>
+                                    <dd class="col-sm-7">
+                                        {{ optional($asset->currency)->symbol }} {{ optional($asset->currency)->name }}
+                                        @if($asset->currency_exchange_rate)
+                                            <small class="text-muted d-block">Rate: {{ $asset->currency_exchange_rate }}</small>
+                                        @endif
+                                    </dd>
+
+                                    <dt class="col-sm-5">Current Value</dt>
+                                    <dd class="col-sm-7 text-success fw-bold">
+                                        {{ optional($asset->currency)->symbol }} {{ number_format($asset->current_value, 2) }}
+                                    </dd>
+
+                                    <dt class="col-sm-5">Purchase Price</dt>
+                                    <dd class="col-sm-7">
+                                        {{ optional($asset->currency)->symbol }} {{ number_format($asset->purchase_price, 2) }}
+                                    </dd>
+
+                                    <dt class="col-sm-5">Purchase Date</dt>
+                                    <dd class="col-sm-7">
+                                        @if($asset->purchase_at)
+                                            {{ \Carbon\Carbon::parse($asset->purchase_at)->format('M d, Y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="info-section">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-sticky-note me-2"></i>Additional Notes
+                                </h5>
+                                <div class="p-3 border rounded bg-white">
+                                    {{ $asset->notes ?? 'No additional notes provided' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="info-section">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-history me-2"></i>Value History
+                        </h5>
+                        <div class="value-history">
+                            @if($asset->valueHistory && $asset->valueHistory->count() > 0)
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th class="text-end">Value</th>
+                                            <th class="text-end">Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $prevValue = null;
+                                        @endphp
+                                        @foreach($asset->valueHistory->sortByDesc('recorded_at') as $history)
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::parse($history->recorded_at)->format('M d, Y') }}</td>
+                                                <td class="text-end">{{ optional($asset->currency)->symbol }} {{ number_format($history->value, 2) }}</td>
+                                                <td class="text-end">
+                                                    @if($prevValue !== null)
+                                                        @php
+                                                            $change = $history->value - $prevValue;
+                                                            $changePercent = $prevValue > 0 ? ($change / $prevValue) * 100 : 0;
+                                                        @endphp
+                                                        <span class="{{ $change >= 0 ? 'text-success' : 'text-danger' }}">
+                                                            {{ $change >= 0 ? '+' : '' }}{{ number_format($changePercent, 2) }}%
+                                                        </span>
+                                                    @endif
+                                                    @php
+                                                        $prevValue = $history->value;
+                                                    @endphp
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info">No value history available</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="border-top pt-3 text-muted small">
+                        <div class="row">
+                            <div class="col-md-6">
+                                Created: {{ \Carbon\Carbon::parse($asset->created_at)->format('M d, Y H:i') }}
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                Last Updated: {{ \Carbon\Carbon::parse($asset->updated_at)->format('M d, Y H:i') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-@endsection
-
-@section('scripts')
-<script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const currencySelect = document.getElementById('currency');
-        const currencySymbol = document.getElementById('currencySymbol');
-
-        currencySelect.addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const symbol = selectedOption.getAttribute('data-symbol') || '$';
-            currencySymbol.textContent = symbol;
-        });
-    });
-</script>
 @endsection

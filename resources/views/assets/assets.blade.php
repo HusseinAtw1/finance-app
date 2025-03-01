@@ -1,84 +1,126 @@
 @extends('welcome')
 
 @section('content')
-<div class="container my-4">
+<div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Your Assets</h2>
-        <a href="{{ route('assets.create') }}" class="btn btn-primary">Add an Asset</a>
+        <h1 class="h2 mb-0">Assets</h1>
     </div>
 
-    <form method="GET" action="{{ route('assets.show') }}">
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label for="account_id" class="form-label">Select Account:</label>
-                <select name="account_id" id="account_id" class="form-control" onchange="this.form.submit()">
-                    @foreach ($accounts as $account)
-                        <option value="{{ $account->id }}" {{ $selectedAccount == $account->id ? 'selected' : '' }}>
-                            {{ $account->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <label for="status" class="form-label">Asset Filter:</label>
-                <select name="status" id="status" class="form-control" onchange="this.form.submit()">
-                    <option value="owned" {{ request('status', 'owned') == 'owned' ? 'selected' : '' }}>Owned</option>
-                    <option value="sold" {{ request('status') == 'sold' ? 'selected' : '' }}>Sold</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label for="search" class="form-label">Search Assets:</label>
-                <input type="text" name="search" id="search" class="form-control" placeholder="Enter search term" value="{{ request('search') }}">
-            </div>
-
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-secondary w-100">Search</button>
-            </div>
-        </div>
-    </form>
-
-    <div class="row">
-        @forelse ($assets as $asset)
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header d-flex align-items-center">
-                        <span class="me-auto">{{ $asset->name }}</span>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('asset_update.show', $asset->id )}}" class="btn btn-success btn-sm">Buy</a>
-                            @if ($asset->assetStatus->name === 'Sold')
-                                <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-primary btn-sm">View</a>
-                            @else
-                                <a href="{{ route('assets_detials.show', $asset->id) }}" class="btn btn-danger btn-sm">Sell</a>
-                            @endif
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form action="{{ route('assets.show') }}" method="GET">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by name">
                         </div>
                     </div>
+                    <div class="col-lg-2 col-md-6">
+                        <select name="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            @foreach($statuses as $status)
+                                <option value="{{ $status->id }}" {{ request('status') == $status->id ? 'selected' : '' }}>
+                                    {{ $status->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <select name="type" class="form-select">
+                            <option value="">All Types</option>
+                            @foreach($types as $assetType)
+                                <option value="{{ $assetType->id }}" {{ request('type') == $assetType->id ? 'selected' : '' }}>
+                                    {{ $assetType->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <select name="storage" class="form-select">
+                            <option value="">All Storages</option>
+                            @foreach($storages as $storage)
+                                <option value="{{ $storage->id }}" {{ request('storage') == $storage->id ? 'selected' : '' }}>
+                                    {{ $storage->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-1 col-md-6">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-1"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @forelse($assets as $asset)
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 hover-shadow">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-truncate">{{ $asset->name }}</h5>
+                        <span class="badge bg-primary rounded-pill">ID: {{ $asset->id }}</span>
+                    </div>
                     <div class="card-body">
-                        <p class="card-text"><strong>Purchased Price:</strong> {{ $asset->purchase_price ?? 'N/A' }} {{$asset->currency->symbol ?? 'N/A'}}</p>
-                        <p class="card-text"><strong>Current Value:</strong> {{ $asset->current_value ?? 'N/A' }} {{$asset->currency->symbol ?? 'N/A'}}</p>
-                        <p class="card-text"><strong>Quantity left:</strong> {{ $asset->quantity ?? 'N/A' }}</p>
-                        <p class="card-text"><strong>Created Date:</strong> {{ $asset->created_at->format('d M, Y') }}</p>
-                        @if ($asset->assetStatus->name === 'Sold')
-                            <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-danger">Sold</span></p>
-                        @elseif (in_array($asset->assetStatus->name, ['Inactive', 'Archived', 'Suspended']))
-                            <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-warning">{{$asset->assetStatus->name}}</span></p>
-                        @else
-                            <p class="card-text"><strong>Status:</strong> <span class="badge text-bg-success">{{$asset->assetStatus->name}}</span></p>
-                        @endif
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Status</span>
+                                <span class="fw-bold">{{ $asset->assetStatus->name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Category</span>
+                                <span class="fw-bold">{{ $asset->assetCategory->name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Type</span>
+                                <span class="fw-bold">{{ $asset->assetType->name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Storage</span>
+                                <span class="fw-bold">{{ $asset->storage->name ?? 'N/A' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 p-3">
+                        <a href=" {{ route('assets_detials.show', $asset->id)}} " class="btn btn-outline-primary w-100">
+                            <i class="bi bi-eye me-2"></i>View Details
+                        </a>
                     </div>
                 </div>
             </div>
         @empty
             <div class="col-12">
-                <p>No assets found with the selected filters.</p>
+                <div class="alert alert-info d-flex align-items-center shadow-sm">
+                    <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+                    <div>No assets found. Try adjusting your search filters.</div>
+                </div>
             </div>
         @endforelse
     </div>
 
-    <div class="d-flex justify-content-center">
-        {{ $assets->appends(request()->query())->links() }}
+    <div class="d-flex justify-content-center mt-4">
+        {{ $assets->links() }}
     </div>
 </div>
-@endsection
 
+<style>
+    body {
+        background-color:#e8e8e8;
+    }
+</style>
+@endsection
