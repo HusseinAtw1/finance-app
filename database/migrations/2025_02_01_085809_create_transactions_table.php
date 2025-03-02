@@ -52,6 +52,8 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('supplier_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('customer_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('currency_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->decimal('currency_exchange_rate', 15, 6)->unsigned()->nullable();
             $table->enum('type', ['credit', 'debit']);
             $table->decimal('current_price', 15, 6)->unsigned();
             $table->decimal('purchase_price', 15, 6)->unsigned();

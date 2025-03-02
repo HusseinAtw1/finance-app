@@ -45,10 +45,13 @@
                         {{-- <li>
 							<a class="dropdown-item" href="{{ route('asset_statuses.show') }}">Asset Status</a>
 						</li> --}}
-
-
 					</ul>
 				</li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('liabilities.index') }}">Liabilities</a>
+                </li>
+
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('currencies.currencies') }}">Currencies</a>
