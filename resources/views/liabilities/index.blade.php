@@ -5,7 +5,7 @@
     <!-- Header with title and add button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h2 mb-0">Liabilities</h1>
-        <a href="#" class="btn btn-primary">
+        <a href="{{ route('liabilities.create') }}" class="btn btn-primary">
             <i class="bi bi-plus me-1"></i> Add Liability
         </a>
     </div>
@@ -57,12 +57,12 @@
                                 <span class="fw-bold text-capitalize">{{ $liability->status }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Amount</span>
-                                <span class="fw-bold">{{ number_format($liability->amount, 2) }}</span>
+                                <span class="text-muted">Amount Paid</span>
+                                <span class="fw-bold">{{ number_format($liability->paid_amount, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Paid</span>
-                                <span class="fw-bold">{{ number_format($liability->paid_amount, 2) }}</span>
+                                <span class="text-muted">Amount To be Paid</span>
+                                <span class="fw-bold">{{ number_format($liability->total_toBePaid, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted">Due Date</span>

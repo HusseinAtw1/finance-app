@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('currency_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->decimal('currency_exchange_rate', 15, 6)->unsigned()->nullable();
+            $table->string('reference_number');
             $table->string('name');
             $table->decimal('paid_amount', 15, 2)->unsigned()->default(0);
             $table->decimal('total_toBePaid', 15, 2)->unsigned();
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->timestampTz('paid_at')->nullable();
             $table->timestampsTz();
             $table->softDeletesTz();
+            $table->unique(['user_id', 'name', 'reference_number']);
         });
     }
 

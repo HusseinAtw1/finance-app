@@ -69,7 +69,8 @@ Route::get('/assets', [AssetController::class, 'show'])->name('assets.show')->mi
 Route::get('/assets/{id}', [AssetController::class, 'detail'])->name('assets_detials.show')->middleware('auth');
 
 Route::get('/liabilities', [LiabilityController::class, 'index'])->name('liabilities.index')->middleware('auth');
-
+Route::get('/liabilities/create', [LiabilityController::class, 'create'])->name('liabilities.create')->middleware('auth');
+Route::POST('/liabilities', [LiabilityController::class, 'store'])->name('liabilities.store')->middleware('auth');
 
 Route::get('/equities', [EquityController::class, 'index'])->name('equities.index')->middleware('auth');
 Route::get('/equities/create', [EquityController::class, 'create'])->name('equities.create')->middleware('auth');
