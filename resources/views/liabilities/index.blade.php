@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="container py-4">
-    <!-- Header with title and add button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h2 mb-0">Liabilities</h1>
         <a href="{{ route('liabilities.create') }}" class="btn btn-primary">
@@ -10,7 +9,6 @@
         </a>
     </div>
 
-    <!-- Search and filter form -->
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
             <form action="{{ route('liabilities.index') }}" method="GET">
@@ -41,7 +39,6 @@
         </div>
     </div>
 
-    <!-- Liabilities cards -->
     <div class="row g-4">
         @forelse($liabilities as $liability)
             <div class="col-lg-4 col-md-6">
@@ -73,14 +70,13 @@
                         </div>
                     </div>
                     <div class="card-footer bg-white border-0 p-3">
-                        <a href="#" class="btn btn-outline-primary w-100">
+                        <a href="{{route('liabilities.show', $liability->id)}}" class="btn btn-outline-primary w-100">
                             <i class="bi bi-eye me-2"></i>View Details
                         </a>
                     </div>
                 </div>
             </div>
         @empty
-            <!-- Message if no liabilities found -->
             <div class="col-12">
                 <div class="alert alert-info d-flex align-items-center shadow-sm">
                     <i class="bi bi-info-circle-fill me-2 fs-4"></i>
@@ -90,7 +86,6 @@
         @endforelse
     </div>
 
-    <!-- Pagination links -->
     <div class="d-flex justify-content-center mt-4">
         {{ $liabilities->links() }}
     </div>

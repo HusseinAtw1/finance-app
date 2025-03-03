@@ -21,4 +21,9 @@ class Currency extends Model
     {
         return $this->hasMany(Asset::class);
     }
+
+    public function liability()
+    {
+        return $this->hasMany(Liability::class);
+    }
 }

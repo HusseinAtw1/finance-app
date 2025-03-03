@@ -91,5 +91,11 @@ class LiabilityController extends Controller
         return redirect()->route('liabilities.index')->with('success', 'Liability created successfully.');
     }
 
+    public function show($id)
+    {
+        $liability = Liability::findOrFail($id);
+        return view('liabilities.detail', compact('liability'));
+    }
+
 
 }

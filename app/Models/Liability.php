@@ -22,5 +22,10 @@ class Liability extends Model
     {
         return $this->belongsTo(Account::class);
     }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
 }
 
