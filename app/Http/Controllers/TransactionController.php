@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\AssetCategory;
 use Illuminate\Validation\Rule;
 use App\Models\AssetDepreciation;
+use App\Models\Liability;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -57,7 +58,13 @@ class TransactionController extends Controller
 
         $storages = Storage::where('user_id', $user->id)->get();
 
-            return view('transactions.transaction_create', compact('transaction', 'transactionDetails', 'assets', 'currencies', 'depreciations', 'suppliers', 'accounts', 'assetTypes', 'assetCategories', 'storages'));
+        $liabilities = Liability::where('user_id', $user->id)->where('status', '!=', 'paid')->get();
+
+        return view('transactions.transaction_create',
+            compact('transaction', 'transactionDetails', 'assets',
+                'currencies', 'depreciations', 'suppliers',
+                'accounts', 'assetTypes', 'assetCategories',
+                'storages', 'liabilities'));
     }
 
     public function createNewTransaction()
@@ -73,5 +80,7 @@ class TransactionController extends Controller
 
         return $this->show($transaction);
     }
+
+    
 
 }

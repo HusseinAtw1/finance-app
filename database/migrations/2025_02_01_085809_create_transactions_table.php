@@ -60,6 +60,7 @@ return new class extends Migration
             $table->decimal('sold_for', 15, 6)->nullable()->unsigned();
             $table->integer('quantity')->unsigned();
             $table->decimal('amount', 15, 6)->unsigned();
+            $table->timestampTz('paid_at')->nullable();
             $table->timestampsTz();
             $table->index('transaction_id');
             $table->index(['transactionable_id', 'transactionable_type'], 'transactable_idx');

@@ -271,13 +271,16 @@ window.document.addEventListener('DOMContentLoaded', function() {
 
 
 const assetTemplate = document.getElementById('assetTemplate');
+const liabilityTemplate = document.getElementById('liabilityTemplate');
 assetTemplate.style.display = 'none';
 
 window.showAssetForm = function() {
     assetTemplate.style.display = 'block';
+    liabilityTemplate.style.display = 'none';
 }
 
 window.showLiabilityForm = function() {
+    liabilityTemplate.style.display = 'block';
     assetTemplate.style.display = 'none';
 }
 

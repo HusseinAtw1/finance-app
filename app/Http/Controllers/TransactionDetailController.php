@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\Customer;
+use App\Models\Liability;
 use App\Models\AssetStatus;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -177,4 +178,41 @@ class TransactionDetailController extends Controller
             ], 500);
         }
     }
+
+    public function payLiability(Request $request, Transaction $transaction)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'liability_id' => ['required', 'integer', Rule::exists('liabilities', 'id')->where('user_id', $user->id)],
+            'account_id'   => ['required', 'integer', Rule::exists('accounts', 'id')->where('user_id', $user->id)],
+            'paid_amount'  => ['required', 'numeric', 'min:0.01'],
+            'paid_at'      => ['required', 'date'],
+        ]);
+
+        $liability = Liability::findOrFail($validated['liability_id']);
+
+        TransactionDetail::create([
+            'transaction_id'        => $transaction->id,
+            'transactionable_type'  => Liability::class,
+            'transactionable_id'    => $liability->id,
+            'account_id'            => $validated['account_id'],
+            'supplier_id'           => null,
+            'customer_id'           => null,
+            'currency_id'           => $liability->currency_id,
+            'currency_exchange_rate'=> $liability->currency_exchange_rate,
+            'type'                  => 'debit',
+            'current_price'         => $validated['paid_amount'],
+            'purchase_price'        => $validated['paid_amount'],
+            'sold_for'              => null,
+            'quantity'              => 1,
+            'amount'                => $validated['paid_amount'],
+            'paid_at'               => $validated['paid_at'],
+            'created_at'            => now(),
+            'updated_at'            => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Liability payment processed successfully.');
+    }
+
 }

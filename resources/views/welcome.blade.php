@@ -1,4 +1,3 @@
-<!-- resources/views/layouts/app.blade.php (or welcome.blade.php) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,13 +8,11 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-  <!-- Include the navbar -->
   @include('components.header')
   <div class="container mt-4">
     @yield('content')
   </div>
 
-  <!-- Yield scripts so that child views can include additional JavaScript -->
   @yield('scripts')
 </body>
 </html>

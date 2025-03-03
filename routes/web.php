@@ -38,11 +38,13 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/transactions', [TransactionController::class, 'index'])->middleware('auth')->name('transactions.show');
 Route::POST('/transactions/create', [TransactionController::class, 'createNewTransaction'])->middleware('auth')->name('create_transaction.create');
-Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->middleware('auth')->name('transaction_create.show');
+Route::get('/transaction/{transaction}', [TransactionController::class, 'show'])->middleware('auth')->name('transaction_create.show');
 
 Route::POST('/transaction/{transaction}', [TransactionDetailController::class, 'buyAsset'])->middleware('auth')->name("transactionDetail_asset.store");
 Route::PATCH('/transaction/{transaction}', [TransactionDetailController::class, 'sellAsset'])->middleware('auth')->name("transactionDetail_asset.sell");
 Route::delete('/transaction-details/{id}', [TransactionDetailController::class, 'destroy'])->name('transaction_detail.destroy');
+Route::POST('/transaction/liability/{transaction}', [TransactionDetailController::class, 'payLiability'])->middleware('auth')->name("transactionDetail_liability.store");
+
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('suppliers', SupplierController::class);
