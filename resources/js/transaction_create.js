@@ -324,5 +324,45 @@ window.deleteTransactionDetail = function(id) {
 };
 
 
+// Function to submit liability form via Axios
+function submitLiabilityForm(e) {
+    e.preventDefault();
+
+    const liabilityForm = document.getElementById('liabilityForm');
+    const formData = new FormData(liabilityForm);
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    axios.post(liabilityForm.action, formData, {
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    .then(response => {
+        showNotification('Liability successfully added to the transaction!');
+        refreshTransactionDetails();
+        liabilityForm.reset();
+    })
+    .catch(error => {
+        if (error.response && error.response.status === 422) {
+            displayErrors(error.response.data.errors);
+            showNotification('Please fix the errors in the form.', 'danger');
+        } else {
+            showNotification('An error occurred while processing your request.', 'danger');
+            console.error('Error:', error);
+        }
+    });
+}
+
+// event listener for liability form
+document.getElementById('liabilityForm').addEventListener('submit', function(e) {
+    submitLiabilityForm(e);
+});
+
+
+
+
+
+
 
 
