@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('liabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('currency_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->decimal('currency_exchange_rate', 15, 6)->unsigned()->nullable();
             $table->string('reference_number');

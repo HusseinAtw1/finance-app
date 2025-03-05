@@ -14,19 +14,20 @@ class CreateExpensesTable extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('currency_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('currency_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->decimal('currency_exchange_rate', 15, 6)->unsigned()->nullable();
+            $table->string('reference_number');
             $table->string('name');
-            $table->decimal('amount', 15, 2);
-            $table->decimal('paid_amount', 15, 2)->nullable();
-            $table->string('category');
-            $table->enum('status', ['pending', 'overdue', 'paid'])->default('pending');
-            $table->text('description');
-            $table->date('due_date');
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
+            $table->decimal('paid_amount', 15, 2)->unsigned()->default(0);
+            $table->decimal('total_toBePaid', 15, 2)->unsigned();
+            $table->enum('status', ['pending', 'paid', 'overdue'])->default('pending')->index();
+            $table->text('description')->nullable();
+            $table->date('due_date')->nullable()->index();
+            $table->timestampTz('paid_at')->nullable();
+            $table->timestampsTz();
+            $table->softDeletesTz();
+            $table->unique(['user_id', 'name', 'reference_number']);
         });
     }
 
