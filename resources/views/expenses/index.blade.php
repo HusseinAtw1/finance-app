@@ -1,87 +1,99 @@
 @extends('welcome')
 
 @section('content')
-<div class="container my-4">
+<div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Your Expenses</h2>
-        <a href="{{ route('expenses.create') }}" class="btn btn-primary">Add an Expense</a>
+        <h1 class="h2 mb-0">Expenses</h1>
+        <a href="{{ route('expenses.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus me-1"></i> Add Expense
+        </a>
     </div>
 
-    <!-- Filter and Search Form -->
-    <form method="GET" action="{{ route('expenses.index') }}">
-        <div class="row mb-3">
-            <!-- Account Filter -->
-            <div class="col-md-3">
-                <label for="account_id" class="form-label">Account:</label>
-                <select name="account_id" id="account_id" class="form-control" onchange="this.form.submit()">
-                    <option value="">All Accounts</option>
-                    @foreach($accounts as $account)
-                        <option value="{{ $account->id }}" {{ request('account_id') == $account->id ? 'selected' : '' }}>
-                            {{ $account->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div class="col-md-3">
-                <label for="status" class="form-label">Status:</label>
-                <select name="status" id="status" class="form-control" onchange="this.form.submit()">
-                    <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>All</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Paid</option>
-                    <option value="overdue" {{ request('status') == 'overdue' ? 'selected' : '' }}>Overdue</option>
-                </select>
-            </div>
-
-            <!-- Search Field -->
-            <div class="col-md-4">
-                <label for="search" class="form-label">Search Expenses:</label>
-                <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or description" value="{{ request('search') }}">
-            </div>
-
-            <!-- Submit Button (if needed) -->
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-secondary w-100">Search</button>
-            </div>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form action="{{ route('expenses.index') }}" method="GET">
+                <div class="row g-3">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by name">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <select name="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Paid</option>
+                            <option value="overdue" {{ request('status') == 'overdue' ? 'selected' : '' }}>Overdue</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-1"></i> Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
-    <div class="row">
-        @forelse ($expenses as $expense)
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Expense ID: {{ $expense->id }}</span>
-                        <a href="{{ route('expenses.show', $expense->id) }}" class="btn btn-primary btn-sm">View</a>
+    <div class="row g-4">
+        @forelse($expenses as $expense)
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 hover-shadow">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-truncate">{{ $expense->name }}</h5>
+                        <span class="badge bg-primary rounded-pill">ID: {{ $expense->id }}</span>
                     </div>
                     <div class="card-body">
-                        <p class="card-text"><strong>Name:</strong> {{ $expense->name }}</p>
-                        <p class="card-text">
-                            <strong>Amount:</strong> {{ $expense->currency }} {{ number_format($expense->amount, 2) }}
-                        </p>
-                        <p class="card-text"><strong>Description:</strong> {{ $expense->description }}</p>
-                        <p class="card-text"><strong>Date:</strong> {{ $expense->created_at->format('M d, Y') }}</p>
-                        <p class="card-text">
-                            <strong>Status:</strong>
-                            <span class="badge
-                                {{ $expense->status == 'paid' ? 'bg-success' : ($expense->status == 'overdue' ? 'bg-danger' : 'bg-warning') }}">
-                                {{ ucfirst($expense->status) }}
-                            </span>
-                        </p>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Status</span>
+                                <span class="fw-bold text-capitalize">{{ $expense->status }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Amount Paid</span>
+                                <span class="fw-bold">{{ number_format($expense->paid_amount, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Amount To be Paid</span>
+                                <span class="fw-bold">{{ number_format($expense->total_toBePaid, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Due Date</span>
+                                <span class="fw-bold">
+                                    {{ $expense->due_date ? \Carbon\Carbon::parse($expense->due_date)->format('M d, Y') : 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 p-3">
+                        <a href="{{route('expenses.show', $expense->id)}}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-eye me-2"></i>View Details
+                        </a>
                     </div>
                 </div>
             </div>
         @empty
             <div class="col-12">
-                <p>No expenses found with the selected filters.</p>
+                <div class="alert alert-info d-flex align-items-center shadow-sm">
+                    <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+                    <div>No Expenses found. Try adjusting your search filters.</div>
+                </div>
             </div>
         @endforelse
     </div>
 
-    <!-- Pagination -->
-    <div class="d-flex justify-content-center">
-        {{ $expenses->appends(request()->query())->links() }}
+    <div class="d-flex justify-content-center mt-4">
+        {{ $expenses->links() }}
     </div>
 </div>
+
+<style>
+    body {
+        background-color: #e8e8e8;
+    }
+</style>
 @endsection

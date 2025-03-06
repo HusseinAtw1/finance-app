@@ -36,7 +36,6 @@ class LiabilityController extends Controller
 
     public function create()
     {
-
         $user = Auth::user();
         $currencies = Currency::where('user_id', $user->id)->get();
         return view('liabilities.create', compact('currencies'));

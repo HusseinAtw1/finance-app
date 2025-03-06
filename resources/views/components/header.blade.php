@@ -69,6 +69,10 @@
                     <a class="nav-link" href="{{ route('storages.index') }}">Storages</a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('expenses.index') }}">Expenses</a>
+                </li>
+
 			</ul>
 
 			<ul class="navbar-nav ms-auto mb-2 mb-lg-0">

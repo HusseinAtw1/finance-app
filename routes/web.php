@@ -85,7 +85,6 @@ Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.ind
 Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create')->middleware('auth');
 Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store')->middleware('auth');
 Route::get('/expenses/{expense}', [ExpenseController::class, 'show'])->name('expenses.show')->middleware('auth');
-Route::put('expenses/{expense}/pay', [ExpenseController::class, 'pay'])->name('expenses.pay.update');
 
 Route::get('/currencies', [CurrencyController::class, 'index'])->name('currencies.currencies')->middleware('auth');
 Route::post('/currencies', [CurrencyController::class, 'store'])->name('currencies.store')->middleware('auth');
