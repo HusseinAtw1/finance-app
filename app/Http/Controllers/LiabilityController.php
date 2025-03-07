@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\Account;
 use App\Models\Currency;
 use App\Models\Liability;
-use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class LiabilityController extends Controller
